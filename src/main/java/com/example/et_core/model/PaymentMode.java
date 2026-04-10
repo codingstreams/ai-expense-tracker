@@ -25,4 +25,8 @@ public class PaymentMode {
 
     @OneToMany(mappedBy = "paymentMode",  fetch = FetchType.LAZY)
     private Set<Transaction> transactionSet;
+
+    public static PaymentMode ofId(Long paymentModeId) {
+        return PaymentMode.builder().id(paymentModeId).build();
+    }
 }

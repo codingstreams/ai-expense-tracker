@@ -22,4 +22,12 @@ public class Category {
 
     @OneToMany(mappedBy="category", fetch = FetchType.LAZY)
     private Set<Transaction> transactionSet;
+
+    @ManyToOne(cascade = CascadeType.ALL , fetch = FetchType.LAZY)
+    @JoinColumn(name = "app_user_id")
+    private AppUser appUser;
+
+    public static Category ofId(Long accountId) {
+        return Category.builder().id(accountId).build();
+    }
 }

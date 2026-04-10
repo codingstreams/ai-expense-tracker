@@ -1,0 +1,12 @@
+spring:
+  application:
+    name: et-core
+
+  datasource:
+    url: jdbc:h2:mem:testdb
+    username: sa
+    password:
+
+  jpa:
+    hibernate:
+      ddl-auto: update

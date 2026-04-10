@@ -19,7 +19,7 @@ public class AppUser {
     private String email;
     private String password;
 
-    private Long createdAt;
+    private Long createdAt = System.currentTimeMillis();
     private Long updatedAt;
     private Long lastLoginAt;
     private Long lastInsightAt;
@@ -38,4 +38,11 @@ public class AppUser {
 
     @OneToMany(mappedBy = "appUser", fetch = FetchType.LAZY)
     private Set<Transaction> transactionSet;
+
+    @OneToMany(mappedBy = "appUser", fetch = FetchType.LAZY)
+    private Set<Category> categorySet;
+
+    public static AppUser ofId(String appUserId) {
+        return AppUser.builder().id(appUserId).build();
+    }
 }

@@ -20,14 +20,14 @@ public class Account {
 
     private String lastFourDigits;
     private Double balance;
-    private Long createdAt;
+    private Long createdAt = System.currentTimeMillis();
     private Long updatedAt;
 
-    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.LAZY)
     @JoinColumn(name = "app_user_id")
     private AppUser appUser;
 
-    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.LAZY)
     @JoinColumn(name = "bank_name_id")
     private Bank bank;
 
@@ -36,4 +36,8 @@ public class Account {
 
     @OneToMany(mappedBy = "account", fetch = FetchType.LAZY)
     private Set<Transaction> transactionSet;
+
+    public static Account ofId(Long accountId) {
+        return Account.builder().id(accountId).build();
+    }
 }
