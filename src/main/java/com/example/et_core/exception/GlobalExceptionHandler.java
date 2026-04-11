@@ -17,6 +17,12 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
     }
 
+    @ExceptionHandler(AccountNotOwnedByUserException.class)
+    public ResponseEntity<?> handleAccountNotOwnedByUserException(AccountNotOwnedByUserException e) {
+        log.error(e.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+    }
+
     @ExceptionHandler(CategoryNotFoundException.class)
     public ResponseEntity<?> handleCategoryNotFoundException(CategoryNotFoundException e) {
         log.error(e.getMessage());
@@ -34,6 +40,12 @@ public class GlobalExceptionHandler {
     public ResponseEntity<?> handleTransactionNotFoundException(TransactionNotFoundException e) {
         log.error(e.getMessage());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+    }
+
+    @ExceptionHandler(InsufficientAccountBalanceException.class)
+    public ResponseEntity<?> handleInsufficientAccountBalanceException(InsufficientAccountBalanceException e) {
+        log.error(e.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
     }
 
     @ExceptionHandler(Exception.class)

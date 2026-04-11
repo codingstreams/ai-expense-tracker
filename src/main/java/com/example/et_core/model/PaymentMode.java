@@ -1,5 +1,6 @@
 package com.example.et_core.model;
 
+import com.example.et_core.service.transaction.TransactionBehavior;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -14,19 +15,22 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PaymentMode {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
 
-    private String name;
+  private String name;
 
-    @OneToMany(mappedBy = "defaultPaymentMode", fetch = FetchType.LAZY)
-    private Set<UserConfig> userConfigSet;
+  @OneToMany(mappedBy = "defaultPaymentMode", fetch = FetchType.LAZY)
+  private Set<UserConfig> userConfigSet;
 
-    @OneToMany(mappedBy = "paymentMode",  fetch = FetchType.LAZY)
-    private Set<Transaction> transactionSet;
+  @OneToMany(mappedBy = "paymentMode", fetch = FetchType.LAZY)
+  private Set<Transaction> transactionSet;
 
-    public static PaymentMode ofId(Long paymentModeId) {
-        return PaymentMode.builder().id(paymentModeId).build();
-    }
+  @Enumerated(EnumType.STRING)
+  private TransactionBehavior type;
+
+  public static PaymentMode ofId(Long paymentModeId) {
+    return PaymentMode.builder().id(paymentModeId).build();
+  }
 }

@@ -7,6 +7,15 @@ VALUES
     ('Cash'),
     ('Digital Wallet');
 
+ALTER TABLE payment_mode
+ADD type VARCHAR(255);
+
+UPDATE payment_mode
+SET type = CASE
+    WHEN LOWER(name) = 'credit card' THEN 'LIABILITY'
+    ELSE 'ASSET'
+END;
+
  INSERT INTO bank (name) VALUES
  ('State Bank of India'),
  ('HDFC Bank'),

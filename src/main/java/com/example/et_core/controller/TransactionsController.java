@@ -3,6 +3,7 @@ package com.example.et_core.controller;
 import com.example.et_core.dto.CreateTransactionDto;
 import com.example.et_core.dto.TransactionDto;
 import com.example.et_core.dto.UpdateTransactionDto;
+import com.example.et_core.exception.InsufficientAccountBalanceException;
 import com.example.et_core.service.transaction.TransactionsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -19,7 +20,7 @@ public class TransactionsController {
     private final TransactionsService transactionsService;
 
     @PostMapping
-    public ResponseEntity<TransactionDto> createTransaction(@RequestBody CreateTransactionDto requestBody) {
+    public ResponseEntity<TransactionDto> createTransaction(@RequestBody CreateTransactionDto requestBody) throws InsufficientAccountBalanceException {
         final var responseBody = transactionsService.saveTransaction(LOGGED_IN_USER, requestBody);
 
         return ResponseEntity

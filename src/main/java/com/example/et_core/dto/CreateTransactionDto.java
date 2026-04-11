@@ -7,6 +7,7 @@ public record CreateTransactionDto (
         String transactionDate,
         Long paymentModeId,
         Long accountId,
-        Long categoryId
+        Long categoryId,
+        Long toAccountId
 ){
 }

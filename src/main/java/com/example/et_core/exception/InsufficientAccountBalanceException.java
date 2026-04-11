@@ -1,0 +1,7 @@
+package com.example.et_core.exception;
+
+public class InsufficientAccountBalanceException extends Throwable {
+  public InsufficientAccountBalanceException(Long accountId) {
+    super(String.format("Insufficient account balance for account %s", accountId));
+  }
+}
