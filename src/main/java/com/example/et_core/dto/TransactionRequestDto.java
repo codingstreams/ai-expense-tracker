@@ -1,6 +1,6 @@
 package com.example.et_core.dto;
 
-public record UpdateTransactionDto(
+public record TransactionRequestDto(
     Long transactionId,
     String type,
     String description,
