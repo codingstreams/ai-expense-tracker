@@ -21,4 +21,6 @@ public interface TransactionRepo extends CrudRepository<Transaction, Long> {
       "WHERE t.appUser.id = :appUserId " +
       "AND t.id = :transactionId")
   void deleteByIdAndAppUserId(Long transactionId, String appUserId);
+
+  List<Transaction> findAllByTransferId(String transferId);
 }

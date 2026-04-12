@@ -6,7 +6,7 @@ import com.example.et_core.model.Account;
 import com.example.et_core.model.TransactionType;
 import com.example.et_core.repo.AccountRepo;
 import com.example.et_core.service.paymentmode.PaymentModeService;
-import com.example.et_core.service.transaction.AccountBalanceStrategyFactory;
+import com.example.et_core.service.account.strategy.AccountBalanceStrategyFactory;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -51,5 +51,20 @@ public class AccountServiceImpl implements AccountService {
   @Override
   public void update(Account account) {
     accountRepo.save(account);
+  }
+
+  @Override
+  public void reverseBalance(Long accountId, Double amount, Long paymentModeId, String type, boolean isSourceAccount) {
+    final var paymentMode = paymentModeService.get(paymentModeId);
+
+    final var accountBalanceStrategy = accountBalanceStrategyFactory.getBalanceStrategy(paymentMode.getType());
+
+    final var account = this.get(accountId);
+
+    final var updatedBalance = accountBalanceStrategy.reverseBalance(account, amount, TransactionType.valueOf(type), isSourceAccount);
+
+    account.setBalance(updatedBalance);
+
+    this.update(account);
   }
 }

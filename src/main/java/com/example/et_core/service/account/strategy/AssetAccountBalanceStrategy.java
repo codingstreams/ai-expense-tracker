@@ -1,8 +1,9 @@
-package com.example.et_core.service.transaction;
+package com.example.et_core.service.account.strategy;
 
 import com.example.et_core.exception.InsufficientAccountBalanceException;
 import com.example.et_core.model.Account;
 import com.example.et_core.model.TransactionType;
+import com.example.et_core.service.transaction.TransactionBehavior;
 import org.springframework.stereotype.Component;
 
 @Component("AssetAccountBalanceStrategy")

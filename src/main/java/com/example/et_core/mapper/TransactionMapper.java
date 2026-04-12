@@ -12,6 +12,7 @@ import java.util.List;
 public interface TransactionMapper {
   TransactionMapper INSTANCE = Mappers.getMapper(TransactionMapper.class);
 
+  @Mapping(target = "transactionId", source = "id")
   TransactionDto transactionDtoToTransactionDto(Transaction transaction);
 
   List<TransactionDto> transactionDtosToTransactionDtos(List<Transaction> transactions);
@@ -23,6 +24,7 @@ public interface TransactionMapper {
 //  @Mapping(target = "amount", source = "dto", qualifiedByName = "mapAmount")
   @Mapping(target = "amount", ignore = true)
   @Mapping(target = "account", ignore = true)
+  @Mapping(target = "transferId", source = "transferId")
   @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
   void transactionFromRequestDto(TransactionRequestDto dto, @MappingTarget Transaction entity, String appUserId, String transferId, boolean isSourceAccount);
 

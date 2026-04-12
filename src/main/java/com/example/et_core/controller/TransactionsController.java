@@ -37,7 +37,7 @@ public class TransactionsController {
     }
 
     @PatchMapping
-    public ResponseEntity<TransactionDto> updateTransaction(@RequestBody TransactionRequestDto requestBody) {
+    public ResponseEntity<TransactionDto> updateTransaction(@RequestBody TransactionRequestDto requestBody) throws InsufficientAccountBalanceException {
         final var responseBody = transactionsService.updateTransaction(LOGGED_IN_USER, requestBody);
 
         return ResponseEntity

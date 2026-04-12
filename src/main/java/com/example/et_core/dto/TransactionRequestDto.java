@@ -9,6 +9,7 @@ public record TransactionRequestDto(
     Long paymentModeId,
     Long accountId,
     Long categoryId,
-    Long toAccountId
+    Long toAccountId,
+    String transferId
 ) {
 }
