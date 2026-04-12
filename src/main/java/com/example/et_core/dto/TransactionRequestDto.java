@@ -1,6 +1,6 @@
 package com.example.et_core.dto;
 
-public record UpdateTransactionDto(
+public record TransactionRequestDto(
     Long transactionId,
     String type,
     String description,
@@ -9,6 +9,7 @@ public record UpdateTransactionDto(
     Long paymentModeId,
     Long accountId,
     Long categoryId,
-    Long toAccountId
+    Long toAccountId,
+    String transferId
 ) {
 }
