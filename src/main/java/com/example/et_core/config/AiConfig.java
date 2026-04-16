@@ -5,6 +5,8 @@ import org.springframework.ai.chat.prompt.ChatOptions;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 @Configuration
 public class AiConfig {
 
@@ -18,5 +20,10 @@ public class AiConfig {
         )
         .build();
 
+  }
+
+  @Bean
+  AtomicInteger requestCounter(){
+    return new AtomicInteger(0);
   }
 }

@@ -1,0 +1,28 @@
+package com.example.et_core.service.ai.parsetask;
+
+import com.example.et_core.model.AiParsingTask;
+import com.example.et_core.model.Status;
+import com.example.et_core.repo.AiParsingTaskRepo;
+import lombok.RequiredArgsConstructor;
+import org.hibernate.query.spi.Limit;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+
+@Service
+@RequiredArgsConstructor
+public class AiParseTaskServiceImpl implements  AiParseTaskService{
+  private final AiParsingTaskRepo repo;
+  @Override
+  public AiParsingTask save(AiParsingTask aiParsingTask) {
+    return repo.save(aiParsingTask);
+  }
+
+  @Override
+  public List<AiParsingTask> getPendingTasks(Status status) {
+    final var limit = new Limit();
+    limit.setMaxRows(13);
+
+    return repo.findAllByStatusOrderByCreatedAtAsc(status, limit);
+  }
+}

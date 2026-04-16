@@ -1,21 +1,35 @@
 package com.example.et_core.service.ai;
 
 import com.example.et_core.dto.AiInputDto;
+import com.example.et_core.dto.AiTaskDto;
 import com.example.et_core.dto.TransactionRequestDto;
+import com.example.et_core.mapper.AiParseTaskMapper;
 import com.example.et_core.mapper.TransactionMapper;
+import com.example.et_core.model.AiParsingTask;
+import com.example.et_core.model.AppUser;
+import com.example.et_core.model.Status;
+import com.example.et_core.service.ai.parsetask.AiParseTaskService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.prompt.SystemPromptTemplate;
 import org.springframework.stereotype.Service;
+import tools.jackson.databind.ObjectMapper;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class AiServiceImpl implements AiService {
   private final TransactionMapper transactionMapper;
+  private final AtomicInteger requestCounter;
+  private final AiParseTaskService aiParseTaskService;
+  private final AiParseTaskMapper aiParseTaskMapper;
+  private final ObjectMapper mapper;
 
   private static final String SYSTEM_PROMPT = """
       Rules:
@@ -46,6 +60,13 @@ public class AiServiceImpl implements AiService {
 
   @Override
   public TransactionRequestDto parse(AiInputDto requestBody) {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public void parse(AiParsingTask task) {
+    final var cCount = requestCounter.incrementAndGet();
+    log.info("START - parse | Request Counter: {}", cCount);
 
     final var formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
 
@@ -65,11 +86,30 @@ public class AiServiceImpl implements AiService {
         .variables(sysPromptVars)
         .build();
 
-    final var aiParseResult = chatClient.prompt(requestBody.rawText())
+    final var aiParseResult = chatClient.prompt(task.getRawInput())
         .system(sysPrompt.render())
         .call()
         .entity(AiParseResult.class);
 
-    return transactionMapper.fromAiParseResult(aiParseResult);
+    task.setStatus(Status.COMPLETED);
+    task.setContent(mapper.writeValueAsString(aiParseResult));
+
+    aiParseTaskService.save(task);
+
+    log.info("END - parse | Request Counter: {}", cCount);
+  }
+
+  @Override
+  public AiTaskDto save(String appUserId, AiInputDto requestBody) {
+
+    final var aiParsingTask = AiParsingTask.builder()
+        .appUser(AppUser.ofId(appUserId))
+        .rawInput(requestBody.rawText())
+        .status(Status.PENDING)
+        .build();
+
+    final var saved = aiParseTaskService.save(aiParsingTask);
+
+    return aiParseTaskMapper.toDto(saved, "Ai Task Saved!");
   }
 }
