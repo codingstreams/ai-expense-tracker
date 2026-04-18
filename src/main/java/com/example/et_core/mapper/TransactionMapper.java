@@ -3,6 +3,7 @@ package com.example.et_core.mapper;
 import com.example.et_core.dto.TransactionDto;
 import com.example.et_core.dto.TransactionRequestDto;
 import com.example.et_core.model.*;
+import com.example.et_core.service.ai.AiParseResult;
 import org.mapstruct.*;
 import org.mapstruct.factory.Mappers;
 
@@ -16,6 +17,8 @@ public interface TransactionMapper {
   TransactionDto transactionDtoToTransactionDto(Transaction transaction);
 
   List<TransactionDto> transactionDtosToTransactionDtos(List<Transaction> transactions);
+
+  TransactionRequestDto fromAiParseResult(AiParseResult aiParseResult);
 
   @Mapping(target = "appUser", source = "appUserId", qualifiedByName = "idToAppUser")
   @Mapping(target = "paymentMode", source = "dto.paymentModeId", qualifiedByName = "idToPaymentMode")
