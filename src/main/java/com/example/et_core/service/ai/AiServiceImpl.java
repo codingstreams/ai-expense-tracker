@@ -2,6 +2,7 @@ package com.example.et_core.service.ai;
 
 import com.example.et_core.dto.AiInputDto;
 import com.example.et_core.dto.AiTaskDto;
+import com.example.et_core.dto.JobStatusDto;
 import com.example.et_core.dto.TransactionRequestDto;
 import com.example.et_core.mapper.AiParseTaskMapper;
 import com.example.et_core.mapper.TransactionMapper;
@@ -9,6 +10,7 @@ import com.example.et_core.model.AiParsingTask;
 import com.example.et_core.model.AppUser;
 import com.example.et_core.model.Status;
 import com.example.et_core.service.ai.parsetask.AiParseTaskService;
+import com.example.et_core.service.notification.NotificationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
@@ -30,6 +32,7 @@ public class AiServiceImpl implements AiService {
   private final AiParseTaskService aiParseTaskService;
   private final AiParseTaskMapper aiParseTaskMapper;
   private final ObjectMapper mapper;
+  private final NotificationService  notificationService;
 
   private static final String SYSTEM_PROMPT = """
       Rules:
@@ -96,6 +99,13 @@ public class AiServiceImpl implements AiService {
 
     aiParseTaskService.save(task);
 
+    notificationService.send(
+        JobStatusDto.of(task.getId().toString(),
+            task.getStatus().name())
+    );
+
+    notificationService.closeConnection(task.getId().toString());
+
     log.info("END - parse | Request Counter: {}", cCount);
   }
 
@@ -109,6 +119,8 @@ public class AiServiceImpl implements AiService {
         .build();
 
     final var saved = aiParseTaskService.save(aiParsingTask);
+
+    notificationService.openConnection(aiParsingTask.getId().toString());
 
     return aiParseTaskMapper.toDto(saved, "Ai Task Saved!");
   }

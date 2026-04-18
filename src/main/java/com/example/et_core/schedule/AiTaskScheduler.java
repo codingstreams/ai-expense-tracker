@@ -1,5 +1,6 @@
 package com.example.et_core.schedule;
 
+import com.example.et_core.dto.JobStatusDto;
 import com.example.et_core.model.AiParsingTask;
 import com.example.et_core.model.Status;
 import com.example.et_core.service.ai.AiService;
@@ -17,6 +18,7 @@ import java.util.PriorityQueue;
 public class AiTaskScheduler {
   private final AiParseTaskService aiParseTaskService;
   private final AiService aiService;
+  private final NotificationService notificationService;
 
   private final PriorityQueue<AiParsingTask> taskQueue = new PriorityQueue<>(Comparator.comparing(AiParsingTask::getCreatedAt));
 
@@ -31,6 +33,11 @@ public class AiTaskScheduler {
       final var aiParsingTask = taskQueue.remove();
       aiParsingTask.setStatus(Status.PROCESSING);
       aiParseTaskService.save(aiParsingTask);
+
+      notificationService.send(
+          JobStatusDto.of(aiParsingTask.getId().toString(),
+              aiParsingTask.getStatus().name())
+      );
 
       aiService.parse(aiParsingTask);
     }
