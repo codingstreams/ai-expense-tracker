@@ -2,8 +2,9 @@ package com.example.et_core.service.ai;
 
 import com.example.et_core.dto.AiInputDto;
 import com.example.et_core.dto.AiTaskDto;
-import com.example.et_core.dto.JobStatusDto;
 import com.example.et_core.dto.TransactionRequestDto;
+import com.example.et_core.event.AiParsingTaskCompleted;
+import com.example.et_core.event.AiParsingTaskCreated;
 import com.example.et_core.mapper.AiParseTaskMapper;
 import com.example.et_core.mapper.TransactionMapper;
 import com.example.et_core.model.AiParsingTask;
@@ -15,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.prompt.SystemPromptTemplate;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import tools.jackson.databind.ObjectMapper;
 
@@ -32,7 +34,7 @@ public class AiServiceImpl implements AiService {
   private final AiParseTaskService aiParseTaskService;
   private final AiParseTaskMapper aiParseTaskMapper;
   private final ObjectMapper mapper;
-  private final NotificationService  notificationService;
+  private final ApplicationEventPublisher eventPublisher;
 
   private static final String SYSTEM_PROMPT = """
       Rules:
@@ -99,12 +101,7 @@ public class AiServiceImpl implements AiService {
 
     aiParseTaskService.save(task);
 
-    notificationService.send(
-        JobStatusDto.of(task.getId().toString(),
-            task.getStatus().name())
-    );
-
-    notificationService.closeConnection(task.getId().toString());
+    eventPublisher.publishEvent(new AiParsingTaskCompleted(task.getId(), task));
 
     log.info("END - parse | Request Counter: {}", cCount);
   }
@@ -120,7 +117,7 @@ public class AiServiceImpl implements AiService {
 
     final var saved = aiParseTaskService.save(aiParsingTask);
 
-    notificationService.openConnection(aiParsingTask.getId().toString());
+    eventPublisher.publishEvent(new AiParsingTaskCreated(aiParsingTask.getId()));
 
     return aiParseTaskMapper.toDto(saved, "Ai Task Saved!");
   }
