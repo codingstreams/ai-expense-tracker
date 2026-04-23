@@ -6,7 +6,8 @@ public record AiParseResult(
     TransactionType type,
     String description,
     Double amount,
-    String transactionDate,
-    String errorMessage
+    String date,
+    String errorMessage,
+    String category
 ) {
 }

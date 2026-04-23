@@ -9,8 +9,10 @@ import com.example.et_core.mapper.AiParseTaskMapper;
 import com.example.et_core.mapper.TransactionMapper;
 import com.example.et_core.model.AiParsingTask;
 import com.example.et_core.model.AppUser;
+import com.example.et_core.model.Category;
 import com.example.et_core.model.Status;
 import com.example.et_core.service.ai.parsetask.AiParseTaskService;
+import com.example.et_core.service.category.CategoryService;
 import com.example.et_core.service.notification.NotificationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,7 +25,9 @@ import tools.jackson.databind.ObjectMapper;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -35,6 +39,7 @@ public class AiServiceImpl implements AiService {
   private final AiParseTaskMapper aiParseTaskMapper;
   private final ObjectMapper mapper;
   private final ApplicationEventPublisher eventPublisher;
+  private final CategoryService categoryService;
 
   private static final String SYSTEM_PROMPT = """
       Rules:
@@ -51,6 +56,8 @@ public class AiServiceImpl implements AiService {
         - Day before yesterday then use {dayBeforeYesterday}
         - If no date then use {today}
         - If date mentioned in raw text then pick that date.
+        
+      5. Infer the category of expense from the list: {categories}
       
       5. Extract description from raw text and don't change or add anything to it.
       
@@ -81,10 +88,15 @@ public class AiServiceImpl implements AiService {
     final var yesterday = formatter.format(now.minusDays(1));
     final var dayBeforeYesterday = formatter.format(now.minusDays(2));
 
+    final var categories = categoryService.getAllWithoutUserId()
+        .stream().map(Category::getName)
+        .collect(Collectors.joining(","));
+
     sysPromptVars.put("today", today);
     sysPromptVars.put("yesterday", yesterday);
     sysPromptVars.put("dayBeforeYesterday", dayBeforeYesterday);
     sysPromptVars.put("year", now.getYear());
+    sysPromptVars.put("categories", categories);
 
     final var sysPrompt = SystemPromptTemplate.builder()
         .template(SYSTEM_PROMPT)

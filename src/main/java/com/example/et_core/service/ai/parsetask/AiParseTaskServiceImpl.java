@@ -25,4 +25,10 @@ public class AiParseTaskServiceImpl implements  AiParseTaskService{
 
     return repo.findAllByStatusOrderByCreatedAtAsc(status, limit);
   }
+
+  @Override
+  public AiParsingTask getByIdWithAppUser(Long jobId) {
+    return repo.findByIdWithAppUser(jobId)
+        .orElseThrow(()-> new RuntimeException("Ai Parse Task not found with id: " + jobId));
+  }
 }

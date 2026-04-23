@@ -20,6 +20,12 @@ public interface TransactionMapper {
 
   TransactionRequestDto fromAiParseResult(AiParseResult aiParseResult);
 
+  @Mapping(target = "transactionDate", source = "result.date")
+  @Mapping(target = "paymentModeId", source = "paymentModeId")
+  @Mapping(target = "accountId", source = "accountId")
+  @Mapping(target = "categoryId", source = "categoryId")
+  TransactionRequestDto fromAiParseTask(AiParseResult result, Long paymentModeId, Long accountId, Long categoryId);
+
   @Mapping(target = "appUser", source = "appUserId", qualifiedByName = "idToAppUser")
   @Mapping(target = "paymentMode", source = "dto.paymentModeId", qualifiedByName = "idToPaymentMode")
 //  @Mapping(target = "account", source = "dto.accountId", qualifiedByName = "idToAccount")

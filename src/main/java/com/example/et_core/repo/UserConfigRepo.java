@@ -1,0 +1,15 @@
+package com.example.et_core.repo;
+
+
+import com.example.et_core.model.UserConfig;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.CrudRepository;
+
+import java.util.Optional;
+
+public interface UserConfigRepo extends CrudRepository<UserConfig, Long> {
+    @Query("SELECT c " +
+        "FROM UserConfig c " +
+        "WHERE c.appUser.id = :appUserId")
+    Optional<UserConfig> findByAppUserId(String appUserId);
+}

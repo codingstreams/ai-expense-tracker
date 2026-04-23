@@ -9,4 +9,6 @@ public interface AiParseTaskService {
   AiParsingTask save(AiParsingTask aiParsingTask);
 
   List<AiParsingTask> getPendingTasks(Status status);
+
+  AiParsingTask getByIdWithAppUser(Long aLong);
 }
