@@ -2,9 +2,12 @@ package com.example.et_core.repo;
 
 
 import com.example.et_core.model.AppUser;
-import com.example.et_core.model.Category;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.repository.CrudRepository;
+
+import java.util.Optional;
 
 public interface AppUserRepo extends JpaRepository<AppUser, Long> {
+  boolean existsByEmail(String email);
+
+  Optional<AppUser> findByEmail(String email);
 }
