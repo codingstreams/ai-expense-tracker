@@ -7,6 +7,7 @@ import com.example.et_core.service.transaction.TransactionsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -15,12 +16,11 @@ import java.util.List;
 @RequestMapping("/api/transactions")
 @RequiredArgsConstructor
 public class TransactionsController {
-    private static final String LOGGED_IN_USER = "f6f2435f-08ac-4b8d-a705-8449ac607685";
-    private final TransactionsService transactionsService;
+        private final TransactionsService transactionsService;
 
     @PostMapping
-    public ResponseEntity<TransactionDto> createTransaction(@RequestBody TransactionRequestDto requestBody) throws InsufficientAccountBalanceException {
-        final var responseBody = transactionsService.saveTransaction(LOGGED_IN_USER, requestBody);
+    public ResponseEntity<TransactionDto> createTransaction(@RequestBody TransactionRequestDto requestBody,@AuthenticationPrincipal String userId) throws InsufficientAccountBalanceException {
+        final var responseBody = transactionsService.saveTransaction(userId, requestBody);
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
@@ -28,8 +28,8 @@ public class TransactionsController {
     }
 
     @GetMapping
-    public ResponseEntity<List<TransactionDto>> getAllTransactions() {
-        final var responseBody = transactionsService.getAllTransactions(LOGGED_IN_USER);
+    public ResponseEntity<List<TransactionDto>> getAllTransactions(@AuthenticationPrincipal String userId) {
+        final var responseBody = transactionsService.getAllTransactions(userId);
 
         return ResponseEntity
             .status(HttpStatus.OK)
@@ -37,8 +37,8 @@ public class TransactionsController {
     }
 
     @PatchMapping
-    public ResponseEntity<TransactionDto> updateTransaction(@RequestBody TransactionRequestDto requestBody) throws InsufficientAccountBalanceException {
-        final var responseBody = transactionsService.updateTransaction(LOGGED_IN_USER, requestBody);
+    public ResponseEntity<TransactionDto> updateTransaction(@RequestBody TransactionRequestDto requestBody, @AuthenticationPrincipal String userId) throws InsufficientAccountBalanceException {
+        final var responseBody = transactionsService.updateTransaction(userId, requestBody);
 
         return ResponseEntity
             .status(HttpStatus.OK)
@@ -46,8 +46,8 @@ public class TransactionsController {
     }
 
     @DeleteMapping("/{transactionId}")
-    public ResponseEntity<Void> deleteTransaction(@PathVariable Long transactionId) {
-        transactionsService.deleteTransaction(LOGGED_IN_USER, transactionId);
+    public ResponseEntity<Void> deleteTransaction(@PathVariable Long transactionId, @AuthenticationPrincipal String userId) {
+        transactionsService.deleteTransaction(userId, transactionId);
 
         return ResponseEntity
             .status(HttpStatus.OK)
