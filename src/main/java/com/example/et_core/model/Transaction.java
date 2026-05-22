@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.util.Set;
 
 @Entity
@@ -22,7 +23,7 @@ public class Transaction {
     private TransactionType type;
 
     private Double amount;
-    private String transactionDate;
+    private LocalDate transactionDate;
     private String transferId;
 
     private String description;

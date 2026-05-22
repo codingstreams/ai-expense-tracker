@@ -19,6 +19,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
@@ -30,9 +31,12 @@ public class SecurityConfig {
   @Bean
   SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity,
                                           JwtAuthFilter jwtAuthFilter,
-                                          AuthenticationEntryPoint authenticationEntryPoint) {
+                                          AuthenticationEntryPoint authenticationEntryPoint,
+                                          UrlBasedCorsConfigurationSource corsConfig) {
 
-    httpSecurity.csrf(CsrfConfigurer::disable)
+    httpSecurity
+        .cors(cors -> cors.configurationSource(corsConfig))
+        .csrf(CsrfConfigurer::disable)
         .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .authorizeHttpRequests(http -> http
             .requestMatchers("/api/auth/**")

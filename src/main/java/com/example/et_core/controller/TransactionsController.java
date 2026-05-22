@@ -36,6 +36,15 @@ public class TransactionsController {
             .body(responseBody);
     }
 
+    @GetMapping("/recent")
+    public ResponseEntity<List<TransactionDto>> getRecentTransactions(@AuthenticationPrincipal String userId) {
+        final var responseBody = transactionsService.getRecentTransactions(userId);
+
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(responseBody);
+    }
+
     @PatchMapping
     public ResponseEntity<TransactionDto> updateTransaction(@RequestBody TransactionRequestDto requestBody, @AuthenticationPrincipal String userId) throws InsufficientAccountBalanceException {
         final var responseBody = transactionsService.updateTransaction(userId, requestBody);

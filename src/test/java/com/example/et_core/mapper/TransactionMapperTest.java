@@ -31,7 +31,8 @@ class TransactionMapperTest {
         paymentModeId,
         accountId,
         categoryId,
-        toAccountId
+        toAccountId,
+        null
     );
 
     final var transaction = new Transaction();
@@ -40,7 +41,7 @@ class TransactionMapperTest {
     assertEquals(TransactionType.valueOf(type), transaction.getType());
     assertEquals(description, transaction.getDescription());
     assertEquals(-amount, transaction.getAmount());
-    assertEquals(transactionDate, transaction.getTransactionDate());
+    assertEquals(java.time.LocalDate.parse(transactionDate, java.time.format.DateTimeFormatter.ofPattern("dd-MM-yyyy")), transaction.getTransactionDate());
     assertEquals(PaymentMode.ofId(paymentModeId), transaction.getPaymentMode());
     assertEquals(Account.ofId(accountId), transaction.getAccount());
     assertEquals(Category.ofId(categoryId), transaction.getCategory());
@@ -67,7 +68,8 @@ class TransactionMapperTest {
         paymentModeId,
         accountId,
         categoryId,
-        toAccountId
+        toAccountId,
+        null
     );
 
     final var transaction = new Transaction();
@@ -76,7 +78,7 @@ class TransactionMapperTest {
     assertEquals(TransactionType.valueOf(type), transaction.getType());
     assertEquals(description, transaction.getDescription());
     assertEquals(amount, transaction.getAmount());
-    assertEquals(transactionDate, transaction.getTransactionDate());
+    assertEquals(java.time.LocalDate.parse(transactionDate, java.time.format.DateTimeFormatter.ofPattern("dd-MM-yyyy")), transaction.getTransactionDate());
     assertEquals(PaymentMode.ofId(paymentModeId), transaction.getPaymentMode());
     assertEquals(Account.ofId(accountId), transaction.getAccount());
     assertEquals(Category.ofId(categoryId), transaction.getCategory());
@@ -103,7 +105,8 @@ class TransactionMapperTest {
         paymentModeId,
         accountId,
         categoryId,
-        toAccountId
+        toAccountId,
+        null
     );
 
     final var transaction = new Transaction();
@@ -112,7 +115,7 @@ class TransactionMapperTest {
     assertEquals(TransactionType.valueOf(type), transaction.getType());
     assertEquals(description, transaction.getDescription());
     assertEquals(-amount, transaction.getAmount());
-    assertEquals(transactionDate, transaction.getTransactionDate());
+    assertEquals(java.time.LocalDate.parse(transactionDate, java.time.format.DateTimeFormatter.ofPattern("dd-MM-yyyy")), transaction.getTransactionDate());
     assertEquals(PaymentMode.ofId(paymentModeId), transaction.getPaymentMode());
     assertEquals(Account.ofId(accountId), transaction.getAccount());
     assertEquals(Category.ofId(categoryId), transaction.getCategory());
@@ -139,7 +142,8 @@ class TransactionMapperTest {
         paymentModeId,
         accountId,
         categoryId,
-        toAccountId
+        toAccountId,
+        null
     );
 
     final var transferId = UUID.randomUUID().toString();
@@ -150,7 +154,7 @@ class TransactionMapperTest {
     assertEquals(TransactionType.valueOf(type), transaction.getType());
     assertEquals(description, transaction.getDescription());
     assertEquals(amount, transaction.getAmount());
-    assertEquals(transactionDate, transaction.getTransactionDate());
+    assertEquals(java.time.LocalDate.parse(transactionDate, java.time.format.DateTimeFormatter.ofPattern("dd-MM-yyyy")), transaction.getTransactionDate());
     assertEquals(PaymentMode.ofId(paymentModeId), transaction.getPaymentMode());
     assertEquals(Account.ofId(toAccountId), transaction.getAccount());
     assertEquals(Category.ofId(categoryId), transaction.getCategory());

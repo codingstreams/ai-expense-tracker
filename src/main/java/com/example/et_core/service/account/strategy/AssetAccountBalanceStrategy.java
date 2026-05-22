@@ -19,7 +19,8 @@ public class AssetAccountBalanceStrategy implements AccountBalanceStrategy {
       return account.getBalance() + amount;
     }
 
-    validate(account, amount);
+    if(transactionType == TransactionType.EXPENSE)
+      validate(account, amount);
 
     return transactionType == TransactionType.EXPENSE ?
         account.getBalance() - amount :

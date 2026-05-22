@@ -14,6 +14,6 @@ spring:
 
 jwt:
   secret-key: ${JWT_KEY}
-  expiration-time-access-token: 600
+  expiration-time-access-token: 6000
 
 debug: false

@@ -48,6 +48,18 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
     }
 
+    @ExceptionHandler(BankNotFoundException.class)
+    public ResponseEntity<?> handleBankNotFoundException(BankNotFoundException e) {
+        log.error(e.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+    }
+
+    @ExceptionHandler(UserAlreadyOnboardedException.class)
+    public ResponseEntity<?> handleUserAlreadyOnboardedException(UserAlreadyOnboardedException e) {
+        log.error(e.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<?> handleException(Exception e) {
         log.error(e.getMessage());

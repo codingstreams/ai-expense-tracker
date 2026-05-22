@@ -33,8 +33,12 @@ public class CmdRunner implements CommandLineRunner {
 //    System.out.println(mapper.writeValueAsString(dto));
 
     if (appUserRepo.findAll().isEmpty()) {
-      final var bank = bankRepo.findByName("State Bank of India")
-          .orElseThrow();
+      final var bankOptional = bankRepo.findByName("State Bank of India");
+      if (bankOptional.isEmpty()) {
+        log.warn("Seeded bank 'State Bank of India' not found. Skipping initial user creation in CmdRunner.");
+        return;
+      }
+      final var bank = bankOptional.get();
 
       final var appUser = AppUser.builder()
           .name("Akshay")

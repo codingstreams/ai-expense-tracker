@@ -2,6 +2,7 @@ package com.example.et_core.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.ColumnDefault;
 
 import java.util.Set;
 
@@ -18,6 +19,9 @@ public class AppUser {
     private String name;
     private String email;
     private String password;
+
+    @ColumnDefault("false")
+    private boolean isOnboardingComplete;
 
     private Long createdAt = System.currentTimeMillis();
     private Long updatedAt;

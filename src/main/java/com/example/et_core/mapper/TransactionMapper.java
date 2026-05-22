@@ -7,6 +7,8 @@ import com.example.et_core.service.ai.AiParseResult;
 import org.mapstruct.*;
 import org.mapstruct.factory.Mappers;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Mapper(componentModel = "spring")
@@ -15,6 +17,11 @@ public interface TransactionMapper {
 
   @Mapping(target = "transactionId", source = "id")
   TransactionDto transactionDtoToTransactionDto(Transaction transaction);
+
+  @Named("convertStringToDate")
+  default LocalDate convertStringToDate(String transactionDate) {
+    return LocalDate.parse(transactionDate, DateTimeFormatter.ofPattern("dd-MM-yyyy"));
+  }
 
   List<TransactionDto> transactionDtosToTransactionDtos(List<Transaction> transactions);
 
@@ -35,6 +42,7 @@ public interface TransactionMapper {
   @Mapping(target = "account", ignore = true)
   @Mapping(target = "transferId", source = "transferId")
   @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+  @Mapping(target = "transactionDate", source = "dto.transactionDate", qualifiedByName = "convertStringToDate")
   void transactionFromRequestDto(TransactionRequestDto dto, @MappingTarget Transaction entity, String appUserId, String transferId, boolean isSourceAccount);
 
   @AfterMapping

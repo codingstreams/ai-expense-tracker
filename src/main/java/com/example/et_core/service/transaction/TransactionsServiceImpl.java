@@ -2,24 +2,26 @@ package com.example.et_core.service.transaction;
 
 import com.example.et_core.dto.TransactionDto;
 import com.example.et_core.dto.TransactionRequestDto;
-import com.example.et_core.exception.*;
+import com.example.et_core.exception.AccountNotOwnedByUserException;
+import com.example.et_core.exception.CategoryNotFoundException;
+import com.example.et_core.exception.InsufficientAccountBalanceException;
+import com.example.et_core.exception.PaymentModeNotFoundException;
 import com.example.et_core.mapper.TransactionMapper;
-import com.example.et_core.model.*;
+import com.example.et_core.model.TransactionType;
 import com.example.et_core.repo.TransactionRepo;
 import com.example.et_core.service.account.AccountService;
 import com.example.et_core.service.appuser.AppUserService;
 import com.example.et_core.service.category.CategoryService;
 import com.example.et_core.service.paymentmode.PaymentModeService;
 import com.example.et_core.service.transaction.strategy.OperationType;
-import com.example.et_core.service.transaction.strategy.TransactionTypeStrategy;
 import com.example.et_core.service.transaction.strategy.TxnTypeStrategyFactory;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -107,5 +109,12 @@ public class TransactionsServiceImpl implements TransactionsService {
   @Override
   public void deleteTransaction(String appUserId, Long transactionId) {
     transactionRepo.deleteByIdAndAppUserId(transactionId, appUserId);
+  }
+
+  @Override
+  public List<TransactionDto> getRecentTransactions(String userId) {
+    var transactions =  transactionRepo.findAllByAppUserRecent(userId, PageRequest.ofSize(5));
+
+    return transactionMapper.transactionDtosToTransactionDtos(transactions);
   }
 }

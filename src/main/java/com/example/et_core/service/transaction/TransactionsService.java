@@ -14,4 +14,6 @@ public interface TransactionsService {
     TransactionDto updateTransaction(String appUserId, TransactionRequestDto requestBody) throws InsufficientAccountBalanceException;
 
     void deleteTransaction(String appUserId, Long transactionId);
+
+    List<TransactionDto> getRecentTransactions(String userId);
 }
