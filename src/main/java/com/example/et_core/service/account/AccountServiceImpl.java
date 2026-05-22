@@ -1,5 +1,6 @@
 package com.example.et_core.service.account;
 
+import com.example.et_core.dto.AccountDto;
 import com.example.et_core.exception.AccountNotFoundException;
 import com.example.et_core.exception.InsufficientAccountBalanceException;
 import com.example.et_core.model.Account;
@@ -27,7 +28,8 @@ public class AccountServiceImpl implements AccountService {
 
   @Transactional
   @Override
-  public void updateBalance(Long accountId, Double amount, Long paymentModeId, String type, boolean isSourceAccount) throws InsufficientAccountBalanceException {
+  public void updateBalance(Long accountId, Double amount, Long paymentModeId, String type, boolean isSourceAccount)
+      throws InsufficientAccountBalanceException {
 
     final var paymentMode = paymentModeService.get(paymentModeId);
 
@@ -35,7 +37,8 @@ public class AccountServiceImpl implements AccountService {
 
     final var account = this.get(accountId);
 
-    final var updatedBalance = accountBalanceStrategy.calculateBalance(account, amount, TransactionType.valueOf(type), isSourceAccount);
+    final var updatedBalance = accountBalanceStrategy.calculateBalance(account, amount, TransactionType.valueOf(type),
+        isSourceAccount);
 
     account.setBalance(updatedBalance);
 
@@ -61,10 +64,19 @@ public class AccountServiceImpl implements AccountService {
 
     final var account = this.get(accountId);
 
-    final var updatedBalance = accountBalanceStrategy.reverseBalance(account, amount, TransactionType.valueOf(type), isSourceAccount);
+    final var updatedBalance = accountBalanceStrategy.reverseBalance(account, amount, TransactionType.valueOf(type),
+        isSourceAccount);
 
     account.setBalance(updatedBalance);
 
     this.update(account);
+  }
+
+  @Override
+  public List<AccountDto> getAllAccounts(String userId) {
+    return accountRepo.findAllByAppUserId(userId)
+        .stream()
+        .map(a -> new AccountDto(a.getId(), "%s (****%s)".formatted(a.getBank().getName(), a.getLastFourDigits())))
+        .toList();
   }
 }
