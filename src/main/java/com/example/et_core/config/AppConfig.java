@@ -18,7 +18,7 @@ public class AppConfig {
     configuration.setAllowedOrigins(List.of("http://localhost:3000"));
 
     // Explicitly allow common methods and headers
-    configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+    configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
     configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "X-Requested-With"));
 
     // Required if you are sending cookies or Authorization headers

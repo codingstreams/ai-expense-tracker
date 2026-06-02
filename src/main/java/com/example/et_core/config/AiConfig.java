@@ -13,17 +13,15 @@ public class AiConfig {
   @Bean
   ChatClient chatClient(ChatClient.Builder chatClientBuilder) {
     return chatClientBuilder.defaultOptions(
-            ChatOptions.builder()
-                .model("llama3.2:latest")
-                .temperature(0.2)
-                .build()
-        )
+        ChatOptions.builder()
+            .model("llama3.2:3b")
+            .temperature(0.2)
+            .build())
         .build();
-
   }
 
   @Bean
-  AtomicInteger requestCounter(){
+  AtomicInteger requestCounter() {
     return new AtomicInteger(0);
   }
 }

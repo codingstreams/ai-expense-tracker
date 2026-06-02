@@ -16,7 +16,7 @@ public interface AccountRepo extends CrudRepository<Account, Long> {
 
     @Query("SELECT a FROM Account a " +
             "JOIN a.appUser u " +
-            "JOIN a.bank b " +
+            "LEFT JOIN a.bank b " +
             "WHERE u.id = :appUserId")
     List<Account> findAllByAppUserId(String appUserId);
 }
