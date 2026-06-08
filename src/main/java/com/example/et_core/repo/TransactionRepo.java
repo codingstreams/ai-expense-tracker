@@ -7,6 +7,10 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 
+import com.example.et_core.dto.DailyCashFlowProjection;
+import com.example.et_core.dto.MonthlyCashFlowProjection;
+
+import java.time.LocalDate;
 import java.util.List;
 
 public interface TransactionRepo extends CrudRepository<Transaction, Long> {
@@ -25,11 +29,30 @@ public interface TransactionRepo extends CrudRepository<Transaction, Long> {
 
   List<Transaction> findAllByTransferId(String transferId);
 
-//  ALTER TABLE your_table
-//  ALTER COLUMN your_column_name TYPE DATE
-//  USING TO_DATE(your_column_name, 'YYYY-MM-DD');
-  @Query("SELECT t FROM Transaction t "+
+  // ALTER TABLE your_table
+  // ALTER COLUMN your_column_name TYPE DATE
+  // USING TO_DATE(your_column_name, 'YYYY-MM-DD');
+  @Query("SELECT t FROM Transaction t " +
       "WHERE t.appUser.id = :appUserId " +
       "ORDER BY t.transactionDate DESC")
   List<Transaction> findAllByAppUserRecent(String appUserId, Pageable pageable);
+
+  @Query("SELECT t.transactionDate as transactionDate, " +
+         "SUM(CASE WHEN t.type = com.example.et_core.model.TransactionType.INCOME THEN t.amount ELSE 0.0 END) as income, " +
+         "SUM(CASE WHEN t.type = com.example.et_core.model.TransactionType.EXPENSE THEN t.amount ELSE 0.0 END) as expense " +
+         "FROM Transaction t " +
+         "WHERE t.appUser.id = :appUserId AND t.transactionDate BETWEEN :startDate AND :endDate " +
+         "GROUP BY t.transactionDate " +
+         "ORDER BY t.transactionDate ASC")
+  List<DailyCashFlowProjection> findCashFlowDaily(String appUserId, LocalDate startDate, LocalDate endDate);
+
+  @Query("SELECT YEAR(t.transactionDate) as year, MONTH(t.transactionDate) as month, " +
+         "SUM(CASE WHEN t.type = com.example.et_core.model.TransactionType.INCOME THEN t.amount ELSE 0.0 END) as income, " +
+         "SUM(CASE WHEN t.type = com.example.et_core.model.TransactionType.EXPENSE THEN t.amount ELSE 0.0 END) as expense " +
+         "FROM Transaction t " +
+         "WHERE t.appUser.id = :appUserId AND t.transactionDate BETWEEN :startDate AND :endDate " +
+         "GROUP BY YEAR(t.transactionDate), MONTH(t.transactionDate) " +
+         "ORDER BY YEAR(t.transactionDate) ASC, MONTH(t.transactionDate) ASC")
+  List<MonthlyCashFlowProjection> findCashFlowMonthly(String appUserId, LocalDate startDate, LocalDate endDate);
+
 }

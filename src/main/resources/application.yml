@@ -1,11 +1,11 @@
 spring:
   application:
-    name: et-core
+    name: et-backend
 
   datasource:
-    url: ${DB_URL}
-    username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/et_db}
+    username: ${DB_USERNAME:admin}
+    password: ${DB_PASSWORD:admin}
 
   jpa:
     hibernate:
@@ -13,7 +13,7 @@ spring:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
 
 jwt:
-  secret-key: ${JWT_KEY}
+  secret-key: ${JWT_KEY:8++ThdrQ62Yvt7qzsuU+GnJnalFL24Px6Oe6cVqJ0jc=}
   expiration-time-access-token: 6000
 
 debug: false
