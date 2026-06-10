@@ -29,7 +29,8 @@ public class EventHandler {
   /**
    * Handles the completed AI parsing task by saving the result as a transaction
    * and notifying the client only AFTER the save succeeds.
-   * This eliminates the race condition where the client was notified before the DB write.
+   * This eliminates the race condition where the client was notified before the
+   * DB write.
    */
   @Async
   @EventListener(AiParsingTaskCompleted.class)
@@ -69,7 +70,8 @@ public class EventHandler {
       log.info("Transaction saved successfully for Job ID: {}", event.jobId());
 
       // Notify client AFTER successful save to prevent false-positive "Success"
-      notificationService.send(JobStatusDto.of(jobId, event.task().getStatus().name()));
+      notificationService.send(JobStatusDto.of(jobId,
+          event.task().getStatus().name()));
       notificationService.closeConnection(jobId);
 
     } catch (Exception e) {
