@@ -8,7 +8,7 @@ import com.example.et_core.event.AiParsingTaskCreated;
 import com.example.et_core.mapper.AiParseTaskMapper;
 import com.example.et_core.model.AiParsingTask;
 import com.example.et_core.model.AppUser;
-import com.example.et_core.model.Category;
+import com.example.et_core.model.SystemCategory;
 import com.example.et_core.model.Status;
 import com.example.et_core.service.ai.parsetask.AiParseTaskService;
 import com.example.et_core.service.category.CategoryService;
@@ -84,8 +84,8 @@ public class AiServiceImpl implements AiService {
     final var yesterday = formatter.format(now.minusDays(1));
     final var dayBeforeYesterday = formatter.format(now.minusDays(2));
 
-    final var categories = categoryService.getAllWithoutUserId()
-        .stream().map(Category::getName)
+    final var categories = categoryService.getAllSystemCategories()
+        .stream().map(SystemCategory::getName)
         .collect(Collectors.joining(","));
 
     sysPromptVars.put("today", today);

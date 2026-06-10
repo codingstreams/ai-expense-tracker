@@ -23,8 +23,8 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
   @Override
   protected void doFilterInternal(HttpServletRequest request,
-                                  HttpServletResponse response,
-                                  FilterChain filterChain) throws ServletException, IOException {
+      HttpServletResponse response,
+      FilterChain filterChain) throws ServletException, IOException {
     // Extract authorization header
     final var requestHeader = request.getHeader(HttpHeaders.AUTHORIZATION);// Bearer <token>
     final var token = extractToken(requestHeader);
@@ -41,12 +41,21 @@ public class JwtAuthFilter extends OncePerRequestFilter {
       SecurityContextHolder.getContext()
           .setAuthentication(authenticatedToken);
 
+      // Set the tenant context for Hibernate filter scoping
+      final var principal = (String) authenticatedToken.getPrincipal();
+      TenantContext.setTenantId(principal);
+
     } catch (AuthenticationException e) {
+      TenantContext.clear();
       SecurityContextHolder.clearContext();
       return;
     }
 
-    filterChain.doFilter(request, response);
+    try {
+      filterChain.doFilter(request, response);
+    } finally {
+      TenantContext.clear();
+    }
   }
 
   private Optional<String> extractToken(String authorizationHeader) {

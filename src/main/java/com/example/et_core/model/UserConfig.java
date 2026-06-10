@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 @Entity
@@ -11,16 +12,15 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserConfig {
+@EqualsAndHashCode(callSuper = false)
+@Table(indexes = @Index(name = "idx_user_config_app_user_id", columnList = "app_user_id"))
+public class UserConfig extends TenantAware {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Enumerated(EnumType.STRING)
     private LanguagePreference languagePreference;
-
-    private Long createdAt;
-    private Long updatedAt;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "app_user_id")

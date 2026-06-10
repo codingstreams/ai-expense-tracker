@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 @Entity
@@ -11,7 +12,9 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class AiParsingTask {
+@EqualsAndHashCode(callSuper = false)
+@Table(indexes = @Index(name = "idx_ai_parsing_task_app_user_id", columnList = "app_user_id"))
+public class AiParsingTask extends TenantAware {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -20,9 +23,6 @@ public class AiParsingTask {
     private String content;
     private String errorMessage;
     private String correlationId;
-
-    @Builder.Default
-    private Long createdAt = System.currentTimeMillis();
 
     @Enumerated(EnumType.STRING)
     private Status status;

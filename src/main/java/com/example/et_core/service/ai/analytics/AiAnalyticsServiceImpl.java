@@ -54,7 +54,6 @@ public class AiAnalyticsServiceImpl implements AiAnalyticsService {
         .appUser(appUser)
         .type(InsightType.WEEKLY)
         .status(Status.PENDING)
-        .createdAt(System.currentTimeMillis())
         .build();
     aiInsightTaskRepo.save(task);
   }
@@ -84,7 +83,6 @@ public class AiAnalyticsServiceImpl implements AiAnalyticsService {
           .appUser(user)
           .type(InsightType.WEEKLY)
           .status(Status.PROCESSING)
-          .createdAt(System.currentTimeMillis())
           .build();
       task = aiInsightTaskRepo.save(task);
 
@@ -96,7 +94,7 @@ public class AiAnalyticsServiceImpl implements AiAnalyticsService {
                 t.getTransactionDate(),
                 t.getType(),
                 t.getAmount(),
-                t.getCategory() != null ? t.getCategory().getName() : "None",
+                t.getCategoryName() != null ? t.getCategoryName() : "None",
                 t.getDescription() != null ? t.getDescription() : ""))
             .collect(Collectors.joining("\n"));
 

@@ -78,7 +78,9 @@ public class TransactionsServiceImpl implements TransactionsService {
       throw new AccountNotOwnedByUserException(accounts, appUserId);
     }
 
-    final var categoryExists = categoryService.existsByUserAndCategory(appUserId, categoryId);
+    boolean isSystemCategory = categoryId == null || categoryId > 0;
+    Long resolvedCategoryId = categoryId != null ? Math.abs(categoryId) : null;
+    final var categoryExists = categoryService.existsByUserAndCategory(appUserId, resolvedCategoryId, isSystemCategory);
 
     if (!categoryExists) {
       throw new CategoryNotFoundException(categoryId);

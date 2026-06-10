@@ -9,36 +9,33 @@ import lombok.NoArgsConstructor;
 
 import java.util.Set;
 
+/**
+ * User-defined custom categories, tenant-scoped.
+ * Each UserCategory belongs to exactly one AppUser.
+ */
 @Entity
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = false)
-@Table(indexes = @Index(name = "idx_account_app_user_id", columnList = "app_user_id"))
-public class Account extends TenantAware {
+@Table(indexes = @Index(name = "idx_user_category_app_user_id", columnList = "app_user_id"))
+public class UserCategory extends TenantAware {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String lastFourDigits;
-    private Double balance;
+    @Column(nullable = false)
+    private String name;
 
     @ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.LAZY)
     @JoinColumn(name = "app_user_id")
     private AppUser appUser;
 
-    @ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.LAZY)
-    @JoinColumn(name = "bank_name_id")
-    private Bank bank;
-
-    @OneToMany(mappedBy = "account", fetch = FetchType.LAZY)
-    private Set<Card> cardSet;
-
-    @OneToMany(mappedBy = "account", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "userCategory", fetch = FetchType.LAZY)
     private Set<Transaction> transactionSet;
 
-    public static Account ofId(Long accountId) {
-        return Account.builder().id(accountId).build();
+    public static UserCategory ofId(Long id) {
+        return UserCategory.builder().id(id).build();
     }
 }

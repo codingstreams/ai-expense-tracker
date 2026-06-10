@@ -44,7 +44,7 @@ class TransactionMapperTest {
     assertEquals(java.time.LocalDate.parse(transactionDate, java.time.format.DateTimeFormatter.ofPattern("dd-MM-yyyy")), transaction.getTransactionDate());
     assertEquals(PaymentMode.ofId(paymentModeId), transaction.getPaymentMode());
     assertEquals(Account.ofId(accountId), transaction.getAccount());
-    assertEquals(Category.ofId(categoryId), transaction.getCategory());
+    assertEquals(SystemCategory.ofId(categoryId), transaction.getSystemCategory());
   }
 
   @Test
@@ -81,7 +81,7 @@ class TransactionMapperTest {
     assertEquals(java.time.LocalDate.parse(transactionDate, java.time.format.DateTimeFormatter.ofPattern("dd-MM-yyyy")), transaction.getTransactionDate());
     assertEquals(PaymentMode.ofId(paymentModeId), transaction.getPaymentMode());
     assertEquals(Account.ofId(accountId), transaction.getAccount());
-    assertEquals(Category.ofId(categoryId), transaction.getCategory());
+    assertEquals(SystemCategory.ofId(categoryId), transaction.getSystemCategory());
   }
 
   @Test
@@ -118,7 +118,7 @@ class TransactionMapperTest {
     assertEquals(java.time.LocalDate.parse(transactionDate, java.time.format.DateTimeFormatter.ofPattern("dd-MM-yyyy")), transaction.getTransactionDate());
     assertEquals(PaymentMode.ofId(paymentModeId), transaction.getPaymentMode());
     assertEquals(Account.ofId(accountId), transaction.getAccount());
-    assertEquals(Category.ofId(categoryId), transaction.getCategory());
+    assertEquals(SystemCategory.ofId(categoryId), transaction.getSystemCategory());
   }
 
   @Test
@@ -157,7 +157,7 @@ class TransactionMapperTest {
     assertEquals(java.time.LocalDate.parse(transactionDate, java.time.format.DateTimeFormatter.ofPattern("dd-MM-yyyy")), transaction.getTransactionDate());
     assertEquals(PaymentMode.ofId(paymentModeId), transaction.getPaymentMode());
     assertEquals(Account.ofId(toAccountId), transaction.getAccount());
-    assertEquals(Category.ofId(categoryId), transaction.getCategory());
+    assertEquals(SystemCategory.ofId(categoryId), transaction.getSystemCategory());
     assertEquals(transferId, transaction.getTransferId());
   }
 

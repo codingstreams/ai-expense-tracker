@@ -1,8 +1,8 @@
 package com.example.et_core.repo;
 
-import com.example.et_core.model.Account;
 import com.example.et_core.model.AppUser;
-import com.example.et_core.model.Category;
+import com.example.et_core.model.SystemCategory;
+import com.example.et_core.model.UserCategory;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
@@ -17,58 +17,60 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @ActiveProfiles("test")
 class CategoryRepoTest {
     @Autowired
-    private CategoryRepo categoryRepo;
+    private UserCategoryRepo userCategoryRepo;
+
+    @Autowired
+    private SystemCategoryRepo systemCategoryRepo;
 
     @Autowired
     private AppUserRepo appUserRepo;
 
     @Test
     void shouldReturnTrue_whenUserAndCategoryMatch() {
-        final var appUser = AppUser.builder()
-                .build();
-
+        final var appUser = AppUser.builder().build();
         final var savedAppUser = appUserRepo.save(appUser);
 
-        final var category = Category.builder()
+        final var category = UserCategory.builder()
                 .appUser(savedAppUser)
+                .name("Test User Category")
                 .build();
 
-        final var savedCategory = categoryRepo.save(category);
+        final var savedCategory = userCategoryRepo.save(category);
 
         final var appUserId = savedAppUser.getId();
         final var categoryId = savedCategory.getId();
 
-        assertTrue(categoryRepo.existsByAppUserIdAndCategoryId(appUserId, categoryId));
+        assertTrue(userCategoryRepo.existsByAppUserIdAndCategoryId(appUserId, categoryId));
     }
 
     @Test
-    void shouldReturnTrue_whenCategoryMatch() {
-        final var category = Category.builder()
+    void shouldReturnTrue_whenSystemCategoryMatch() {
+        final var category = SystemCategory.builder()
+                .name("Test System Category")
                 .build();
 
-        final var savedCategory = categoryRepo.save(category);
+        final var savedCategory = systemCategoryRepo.save(category);
 
         final var categoryId = savedCategory.getId();
 
-        assertTrue(categoryRepo.existsById(categoryId));
+        assertTrue(systemCategoryRepo.existsById(categoryId));
     }
 
     @Test
     void shouldReturnFalse_whenUserAndCategoryNotMatch() {
-        final var appUser = AppUser.builder()
-                .build();
-
+        final var appUser = AppUser.builder().build();
         final var savedAppUser = appUserRepo.save(appUser);
 
-        final var category = Category.builder()
+        final var category = UserCategory.builder()
                 .appUser(savedAppUser)
+                .name("Test User Category")
                 .build();
 
-        final var savedCategory = categoryRepo.save(category);
+        final var savedCategory = userCategoryRepo.save(category);
 
         final var appUserId = UUID.randomUUID().toString();
         final var categoryId = savedCategory.getId();
 
-        assertFalse(categoryRepo.existsByAppUserIdAndCategoryId(appUserId, categoryId));
+        assertFalse(userCategoryRepo.existsByAppUserIdAndCategoryId(appUserId, categoryId));
     }
 }

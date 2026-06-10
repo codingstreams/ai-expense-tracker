@@ -17,11 +17,24 @@ public interface TransactionMapper {
   TransactionMapper INSTANCE = Mappers.getMapper(TransactionMapper.class);
 
   @Mapping(target = "transactionId", source = "id")
+  @Mapping(target = "category", expression = "java(transactionToCategoryDto(transaction))")
   TransactionDto transactionDtoToTransactionDto(Transaction transaction);
 
-  default CategoryDto categoryToCategoryDto(Category category) {
-    if (category == null) return null;
-    return new CategoryDto(category.getId(), category.getName());
+  /**
+   * Maps the effective category from a Transaction to a CategoryDto.
+   * UserCategory takes precedence; falls back to SystemCategory.
+   */
+  default CategoryDto transactionToCategoryDto(Transaction transaction) {
+    if (transaction == null) return null;
+    if (transaction.getUserCategory() != null) {
+      return new CategoryDto(transaction.getUserCategory().getId(),
+          transaction.getUserCategory().getName(), false);
+    }
+    if (transaction.getSystemCategory() != null) {
+      return new CategoryDto(transaction.getSystemCategory().getId(),
+          transaction.getSystemCategory().getName(), true);
+    }
+    return null;
   }
 
   @Named("convertStringToDate")
@@ -41,15 +54,30 @@ public interface TransactionMapper {
 
   @Mapping(target = "appUser", source = "appUserId", qualifiedByName = "idToAppUser")
   @Mapping(target = "paymentMode", source = "dto.paymentModeId", qualifiedByName = "idToPaymentMode")
-//  @Mapping(target = "account", source = "dto.accountId", qualifiedByName = "idToAccount")
-  @Mapping(target = "category", source = "dto.categoryId", qualifiedByName = "idToCategory")
-//  @Mapping(target = "amount", source = "dto", qualifiedByName = "mapAmount")
+  @Mapping(target = "systemCategory", ignore = true)
+  @Mapping(target = "userCategory", ignore = true)
   @Mapping(target = "amount", ignore = true)
   @Mapping(target = "account", ignore = true)
   @Mapping(target = "transferId", source = "transferId")
   @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
   @Mapping(target = "transactionDate", source = "dto.transactionDate", qualifiedByName = "convertStringToDate")
   void transactionFromRequestDto(TransactionRequestDto dto, @MappingTarget Transaction entity, String appUserId, String transferId, boolean isSourceAccount);
+
+  @AfterMapping
+  default void mapCategory(TransactionRequestDto dto, @MappingTarget Transaction entity) {
+    if (dto.categoryId() != null) {
+      if (dto.categoryId() < 0) {
+        entity.setUserCategory(UserCategory.ofId(Math.abs(dto.categoryId())));
+        entity.setSystemCategory(null);
+      } else {
+        entity.setSystemCategory(SystemCategory.ofId(dto.categoryId()));
+        entity.setUserCategory(null);
+      }
+    } else {
+      entity.setSystemCategory(null);
+      entity.setUserCategory(null);
+    }
+  }
 
   @AfterMapping
   default void mapAmountAndAccount(TransactionRequestDto dto, @MappingTarget Transaction entity, boolean isSourceAccount) {
@@ -89,8 +117,13 @@ public interface TransactionMapper {
     return id != null ? Account.ofId(id) : null;
   }
 
-  @Named("idToCategory")
-  default Category idToCategory(Long id) {
-    return id != null ? Category.ofId(id) : null;
+  @Named("idToSystemCategory")
+  default SystemCategory idToSystemCategory(Long id) {
+    return id != null ? SystemCategory.ofId(id) : null;
+  }
+
+  @Named("idToUserCategory")
+  default UserCategory idToUserCategory(Long id) {
+    return id != null ? UserCategory.ofId(id) : null;
   }
 }

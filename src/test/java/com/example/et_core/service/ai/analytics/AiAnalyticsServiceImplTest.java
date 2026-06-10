@@ -100,7 +100,6 @@ class AiAnalyticsServiceImplTest {
               .type(argument.getType())
               .status(argument.getStatus())
               .insightText(argument.getInsightText())
-              .createdAt(argument.getCreatedAt())
               .build();
         });
 

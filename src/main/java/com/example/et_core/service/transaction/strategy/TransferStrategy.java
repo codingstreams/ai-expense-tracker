@@ -35,7 +35,7 @@ public class TransferStrategy implements TransactionTypeStrategy {
         throw new RuntimeException("Transfer ID is null");
       }
 
-      final var transactions = transactionRepo.findAllByTransferId(transferId);
+      final var transactions = transactionRepo.findAllByTransferIdAndAppUserId(transferId, appUserId);
 
       if (transactions.isEmpty() || transactions.size() < 2) {
         throw new RuntimeException("Unable to find any transactions for transferId: " + dto.transferId());

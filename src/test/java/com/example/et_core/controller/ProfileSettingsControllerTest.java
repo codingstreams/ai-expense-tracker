@@ -85,7 +85,6 @@ public class ProfileSettingsControllerTest {
             .appUser(appUser)
             .balance(5000.0)
             .lastFourDigits("1111")
-            .createdAt(System.currentTimeMillis())
             .build());
 
         // Create a Cash Account
@@ -94,16 +93,15 @@ public class ProfileSettingsControllerTest {
             .appUser(appUser)
             .balance(200.0)
             .lastFourDigits("CASH")
-            .createdAt(System.currentTimeMillis())
             .build());
 
         // Create a Credit Card Card linked to the savings account
         cardRepo.save(Card.builder()
             .account(savings)
+            .appUser(appUser)
             .cardType(CardType.CREDIT_CARD)
             .lastFourDigits("9999")
             .creditLimit(100000.0)
-            .createdAt(System.currentTimeMillis())
             .build());
 
         // Setup UserConfig
@@ -112,8 +110,6 @@ public class ProfileSettingsControllerTest {
             .defaultPaymentMode(defaultPaymentMode)
             .defaultAccount(savings)
             .languagePreference(LanguagePreference.ENGLISH)
-            .createdAt(System.currentTimeMillis())
-            .updatedAt(System.currentTimeMillis())
             .build());
     }
 

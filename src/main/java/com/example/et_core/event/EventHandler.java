@@ -55,13 +55,13 @@ public class EventHandler {
         return;
       }
 
-      final var category = categoryService.getByName(aiParseResult.category());
+      final var category = categoryService.getSystemCategoryByName(aiParseResult.category());
 
       final var requestDto = TransactionMapper.INSTANCE.fromAiParseTask(
           aiParseResult, // Task --> Source
           userConfig.getDefaultPaymentMode().getId(), // Payment Mode Id
           userConfig.getDefaultAccount().getId(), // Account ID
-          category.getId() // Category Id
+          category.getId() // System Category Id
       );
 
       log.info("Saving transaction: {}", requestDto);

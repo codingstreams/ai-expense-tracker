@@ -29,7 +29,8 @@ public interface TransactionRepo extends CrudRepository<Transaction, Long> {
       "AND t.id = :transactionId")
   void deleteByIdAndAppUserId(Long transactionId, String appUserId);
 
-  List<Transaction> findAllByTransferId(String transferId);
+  @Query("SELECT t FROM Transaction t WHERE t.transferId = :transferId AND t.appUser.id = :appUserId")
+  List<Transaction> findAllByTransferIdAndAppUserId(String transferId, String appUserId);
 
   // ALTER TABLE your_table
   // ALTER COLUMN your_column_name TYPE DATE
@@ -60,11 +61,11 @@ public interface TransactionRepo extends CrudRepository<Transaction, Long> {
   @Query("SELECT t FROM Transaction t WHERE t.appUser.id = :appUserId AND t.transactionDate >= :startDate ORDER BY t.transactionDate DESC")
   List<Transaction> findRecentTransactions(@Param("appUserId") String appUserId, @Param("startDate") LocalDate startDate);
 
-  @Query("SELECT COALESCE(t.category.name, 'Uncategorized') as label, SUM(ABS(t.amount)) as amount " +
+  @Query("SELECT COALESCE(t.userCategory.name, t.systemCategory.name, 'Uncategorized') as label, SUM(ABS(t.amount)) as amount " +
          "FROM Transaction t " +
          "WHERE t.appUser.id = :appUserId AND t.type = com.example.et_core.model.TransactionType.EXPENSE " +
          "AND t.transactionDate BETWEEN :startDate AND :endDate " +
-         "GROUP BY COALESCE(t.category.name, 'Uncategorized')")
+         "GROUP BY COALESCE(t.userCategory.name, t.systemCategory.name, 'Uncategorized')")
   List<Object[]> findCategorySpend(
       @Param("appUserId") String appUserId,
       @Param("startDate") LocalDate startDate,

@@ -45,7 +45,7 @@ public class AppUser {
     private Set<Transaction> transactionSet;
 
     @OneToMany(mappedBy = "appUser", fetch = FetchType.LAZY)
-    private Set<Category> categorySet;
+    private Set<UserCategory> userCategorySet;
 
     public static AppUser ofId(String appUserId) {
         return AppUser.builder().id(appUserId).build();
