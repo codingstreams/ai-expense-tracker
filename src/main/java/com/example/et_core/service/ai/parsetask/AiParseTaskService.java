@@ -10,5 +10,9 @@ public interface AiParseTaskService {
 
   List<AiParsingTask> getPendingTasks(Status status);
 
+  List<AiParsingTask> getPendingTasksWithAppUser(Status status);
+
   AiParsingTask getByIdWithAppUser(Long aLong);
+
+  List<AiParsingTask> getActiveTasks(String appUserId);
 }

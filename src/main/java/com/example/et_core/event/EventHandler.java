@@ -6,12 +6,22 @@ import com.example.et_core.service.ai.parsetask.AiParseTaskService;
 import com.example.et_core.service.category.CategoryService;
 import com.example.et_core.service.transaction.TransactionsService;
 import com.example.et_core.service.userconfig.UserConfigService;
+
+import jakarta.transaction.Transactional;
+
+import com.example.et_core.security.TenantContext;
+import com.example.et_core.service.notifications.NotificationService;
+import com.example.et_core.service.notifications.NotificationService.NotificationEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import tools.jackson.databind.ObjectMapper;
+
+import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 @Component
 @RequiredArgsConstructor
@@ -22,6 +32,9 @@ public class EventHandler {
   private final AiParseTaskService aiParseTaskService;
   private final CategoryService categoryService;
   private final ObjectMapper mapper;
+  private final NotificationService notificationService;
+
+  private final Executor taskExecutor = Executors.newFixedThreadPool(10);
 
   /**
    * Handles the completed AI parsing task by saving the result as a transaction
@@ -29,54 +42,68 @@ public class EventHandler {
    * This eliminates the race condition where the client was notified before the
    * DB write.
    */
-  @Async
   @EventListener(AiParsingTaskCompleted.class)
   public void saveResultAsTxn(AiParsingTaskCompleted event) {
-    log.info("Ai parsing task completed. Converting and saving data into DB. Job ID: {}", event.jobId());
     final var jobId = event.jobId().toString();
 
-    try {
-      final var task = aiParseTaskService.getByIdWithAppUser(event.jobId());
-      final var appUserId = task.getAppUser().getId();
-      log.info("Processing transaction parsing result for user ID: {}", appUserId);
+    CompletableFuture.runAsync(() -> {
+      log.info("Ai parsing task completed. Converting and saving data into DB. Job ID: {}", event.jobId());
+      String appUserId = null;
 
-      // Get default Payment mode and account
-      final var userConfig = userConfigService.getByUserId(appUserId);
-
-      final var aiParseResult = mapper.readValue(event.task().getContent(), AiParseResult.class);
-      log.info("Parsed AI result content: {}", aiParseResult);
-
-      if (aiParseResult.errorMessage() != null && !aiParseResult.errorMessage().isEmpty()) {
-        log.warn("AI parsing returned error: {}. Aborting transaction save.", aiParseResult.errorMessage());
-        return;
-      }
-
-      final var category = categoryService.getSystemCategoryByName(aiParseResult.category());
-
-      final var requestDto = TransactionMapper.INSTANCE.fromAiParseTask(
-          aiParseResult, // Task --> Source
-          userConfig.getDefaultPaymentMode().getId(), // Payment Mode Id
-          userConfig.getDefaultAccount().getId(), // Account ID
-          category.getId() // System Category Id
-      );
-
-      log.info("Saving transaction: {}", requestDto);
-      transactionsService.saveTransaction(appUserId, requestDto);
-      log.info("Transaction saved successfully for Job ID: {}", event.jobId());
-
-      // Notify client AFTER successful save to prevent false-positive "Success"
-
-    } catch (Exception e) {
-      log.error("Failed to save transaction for completed AI parsing task. Job ID: {}", event.jobId(), e);
       try {
-      } catch (Exception notifyEx) {
-        log.error("Failed to send FAILED notification status to client for Job ID: {}", event.jobId(), notifyEx);
-      }
-    }
-  }
+        final var task = aiParseTaskService.getByIdWithAppUser(event.jobId());
+        appUserId = task.getAppUser().getId();
+        log.info("Processing transaction parsing result for user ID: {}", appUserId);
 
-  @EventListener(AiParsingTaskCreated.class)
-  public void openConnection(AiParsingTaskCreated event) {
-    log.info("Ai parsing task created. Opening connection...");
+        // Set the TenantContext for the async thread
+        TenantContext.setTenantId(appUserId);
+
+        // Get default Payment mode and account
+        final var userConfig = userConfigService.getByUserId(appUserId);
+
+        final var aiParseResult = mapper.readValue(event.task().getContent(), AiParseResult.class);
+        log.info("Parsed AI result content: {}", aiParseResult);
+
+        if (aiParseResult.errorMessage() != null && !aiParseResult.errorMessage().isEmpty()) {
+          log.warn("AI parsing returned error: {}. Aborting transaction save.", aiParseResult.errorMessage());
+          notificationService.send(appUserId, null, NotificationEvent.AI_TASK_FAILED, Map.of(
+              "jobId", jobId,
+              "error", aiParseResult.errorMessage()));
+          return;
+        }
+
+        final var category = categoryService.getSystemCategoryByName(aiParseResult.category());
+
+        final var requestDto = TransactionMapper.INSTANCE.fromAiParseTask(
+            aiParseResult, // Task --> Source
+            userConfig.getDefaultPaymentMode().getId(), // Payment Mode Id
+            userConfig.getDefaultAccount().getId(), // Account ID
+            category.getId() // System Category Id
+        );
+
+        log.info("Saving transaction: {}", requestDto);
+        transactionsService.saveTransaction(appUserId, requestDto);
+        log.info("Transaction saved successfully for Job ID: {}", event.jobId());
+
+        // Notify client AFTER successful save to prevent false-positive "Success"
+        notificationService.send(appUserId, null, NotificationEvent.AI_TASK_COMPLETED, Map.of(
+            "jobId", jobId,
+            "status", "COMPLETED"));
+
+      } catch (Exception e) {
+        log.error("Failed to save transaction for completed AI parsing task. Job ID: {}", event.jobId(), e);
+        if (appUserId != null) {
+          try {
+            notificationService.send(appUserId, null, NotificationEvent.AI_TASK_FAILED, Map.of(
+                "jobId", jobId,
+                "error", e.getMessage() != null ? e.getMessage() : "Unknown error occurred during processing"));
+          } catch (Exception notifyEx) {
+            log.error("Failed to send FAILED notification status to client for Job ID: {}", event.jobId(), notifyEx);
+          }
+        }
+      } finally {
+        TenantContext.clear();
+      }
+    }, taskExecutor);
   }
 }

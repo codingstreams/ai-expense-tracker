@@ -1,5 +1,6 @@
 package com.example.et_core.service.ai;
 
+import com.example.et_core.dto.AiActiveTaskDto;
 import com.example.et_core.dto.AiInputDto;
 import com.example.et_core.dto.AiTaskDto;
 import com.example.et_core.dto.TransactionRequestDto;
@@ -128,5 +129,13 @@ public class AiServiceImpl implements AiService {
     eventPublisher.publishEvent(new AiParsingTaskCreated(aiParsingTask.getId()));
 
     return aiParseTaskMapper.toDto(saved, "Ai Task Saved!");
+  }
+
+  @Override
+  public java.util.List<AiActiveTaskDto> getActiveTasks(String appUserId) {
+    return aiParseTaskService.getActiveTasks(appUserId)
+        .stream()
+        .map(task -> new AiActiveTaskDto(task.getId().toString(), task.getStatus()))
+        .toList();
   }
 }
