@@ -20,7 +20,10 @@ public class Account {
 
     private String lastFourDigits;
     private Double balance;
+
+    @Builder.Default
     private Long createdAt = System.currentTimeMillis();
+
     private Long updatedAt;
 
     @ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.LAZY)

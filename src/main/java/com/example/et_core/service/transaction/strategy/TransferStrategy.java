@@ -11,8 +11,6 @@ import com.example.et_core.repo.TransactionRepo;
 import com.example.et_core.service.account.AccountService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-
-import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -23,9 +21,9 @@ public class TransferStrategy implements TransactionTypeStrategy {
   private final TransactionMapper transactionMapper;
   private final TransactionRepo transactionRepo;
 
-
   @Override
-  public TransactionDto process(String appUserId, TransactionRequestDto dto, OperationType type) throws InsufficientAccountBalanceException {
+  public TransactionDto process(String appUserId, TransactionRequestDto dto, OperationType type)
+      throws InsufficientAccountBalanceException {
     Transaction debitTransaction;
     Transaction creditTransaction;
     String transferId;
@@ -53,10 +51,11 @@ public class TransferStrategy implements TransactionTypeStrategy {
           .findAny()
           .orElseThrow(() -> new TransactionNotFoundException(dto.accountId()));
 
+      accountService.reverseBalance(debitTransaction.getAccount().getId(), Math.abs(debitTransaction.getAmount()),
+          dto.paymentModeId(), dto.type(), true);
 
-      accountService.reverseBalance(debitTransaction.getAccount().getId(), Math.abs(debitTransaction.getAmount()), dto.paymentModeId(), dto.type(), true);
-
-      accountService.reverseBalance(creditTransaction.getAccount().getId(), Math.abs(creditTransaction.getAmount()), dto.paymentModeId(), dto.type(), false);
+      accountService.reverseBalance(creditTransaction.getAccount().getId(), Math.abs(creditTransaction.getAmount()),
+          dto.paymentModeId(), dto.type(), false);
 
     } else {
       debitTransaction = new Transaction();

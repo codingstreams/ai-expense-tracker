@@ -23,6 +23,7 @@ public class AppUser {
     @ColumnDefault("false")
     private boolean isOnboardingComplete;
 
+    @Builder.Default
     private Long createdAt = System.currentTimeMillis();
     private Long updatedAt;
     private Long lastLoginAt;

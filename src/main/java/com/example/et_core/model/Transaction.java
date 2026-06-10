@@ -47,6 +47,7 @@ public class Transaction {
     @JoinColumn(name = "app_user_id")
     private AppUser appUser;
 
+    @Builder.Default
     private Long createdAt = System.currentTimeMillis();
     private Long updatedAt;
 }

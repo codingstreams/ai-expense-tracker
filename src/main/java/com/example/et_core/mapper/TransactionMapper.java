@@ -1,5 +1,6 @@
 package com.example.et_core.mapper;
 
+import com.example.et_core.dto.CategoryDto;
 import com.example.et_core.dto.TransactionDto;
 import com.example.et_core.dto.TransactionRequestDto;
 import com.example.et_core.model.*;
@@ -17,6 +18,11 @@ public interface TransactionMapper {
 
   @Mapping(target = "transactionId", source = "id")
   TransactionDto transactionDtoToTransactionDto(Transaction transaction);
+
+  default CategoryDto categoryToCategoryDto(Category category) {
+    if (category == null) return null;
+    return new CategoryDto(category.getId(), category.getName());
+  }
 
   @Named("convertStringToDate")
   default LocalDate convertStringToDate(String transactionDate) {

@@ -6,14 +6,12 @@ import com.example.et_core.dto.TransactionRequestDto;
 import com.example.et_core.event.AiParsingTaskCompleted;
 import com.example.et_core.event.AiParsingTaskCreated;
 import com.example.et_core.mapper.AiParseTaskMapper;
-import com.example.et_core.mapper.TransactionMapper;
 import com.example.et_core.model.AiParsingTask;
 import com.example.et_core.model.AppUser;
 import com.example.et_core.model.Category;
 import com.example.et_core.model.Status;
 import com.example.et_core.service.ai.parsetask.AiParseTaskService;
 import com.example.et_core.service.category.CategoryService;
-import com.example.et_core.service.notification.NotificationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
@@ -25,7 +23,6 @@ import tools.jackson.databind.ObjectMapper;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
-import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
@@ -33,7 +30,6 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Slf4j
 public class AiServiceImpl implements AiService {
-  private final TransactionMapper transactionMapper;
   private final AtomicInteger requestCounter;
   private final AiParseTaskService aiParseTaskService;
   private final AiParseTaskMapper aiParseTaskMapper;
@@ -44,27 +40,27 @@ public class AiServiceImpl implements AiService {
   private static final String SYSTEM_PROMPT = """
       Rules:
       1. Your job is to parse the raw text from the user which is either related to expense or income.
-      
+
       2. Based on the type of text decide the 'type' field of output json. Allowed values for 'type' fields are EXPENSE or INCOME.
-      
+
       3. Field 'transactionDate' is having date format: dd-mm-yyyy
-      
-      4. If the user uses relative dates (e.g., 'today', 'yesterday'). Get the date from following: 
+
+      4. If the user uses relative dates (e.g., 'today', 'yesterday'). Get the date from following:
         - Current Year for reference: {year}
         - If Today then use {today}
         - If Yesterday then use {yesterday}
         - Day before yesterday then use {dayBeforeYesterday}
         - If no date then use {today}
         - If date mentioned in raw text then pick that date.
-        
+
       5. Infer the category of expense from the list: {categories}
-      
+
       5. Extract description from raw text and don't change or add anything to it.
-      
+
       6. Extract amount from raw text and don't change or add anything to it. Just convert the string to double representation.
-      
+
       7. Don't answer anything not related to expense or income related raw text. Simply set the 'errorMessage' field of the output json with "NOT_VALID_INPUT"
-      
+
       8. Raw Text is in English or Hindi language only.
       """;
 

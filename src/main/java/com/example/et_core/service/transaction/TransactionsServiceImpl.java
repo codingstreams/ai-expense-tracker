@@ -10,7 +10,6 @@ import com.example.et_core.mapper.TransactionMapper;
 import com.example.et_core.model.TransactionType;
 import com.example.et_core.repo.TransactionRepo;
 import com.example.et_core.service.account.AccountService;
-import com.example.et_core.service.appuser.AppUserService;
 import com.example.et_core.service.category.CategoryService;
 import com.example.et_core.service.paymentmode.PaymentModeService;
 import com.example.et_core.service.transaction.strategy.OperationType;
@@ -26,7 +25,6 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class TransactionsServiceImpl implements TransactionsService {
-  private final AppUserService appUserService;
   private final AccountService accountService;
   private final CategoryService categoryService;
   private final PaymentModeService paymentModeService;
@@ -36,11 +34,14 @@ public class TransactionsServiceImpl implements TransactionsService {
 
   @Transactional
   @Override
-  public TransactionDto saveTransaction(String appUserId, TransactionRequestDto requestBody) throws InsufficientAccountBalanceException {
+  public TransactionDto saveTransaction(String appUserId, TransactionRequestDto requestBody)
+      throws InsufficientAccountBalanceException {
 
     getAndValidateAccounts(requestBody, appUserId);
 
-    final var transactionType = TransactionType.valueOf(requestBody.type()) == TransactionType.TRANSFER? TransactionType.TRANSFER: TransactionType.INCOME;
+    final var transactionType = TransactionType.valueOf(requestBody.type()) == TransactionType.TRANSFER
+        ? TransactionType.TRANSFER
+        : TransactionType.INCOME;
 
     final var strategy = txnTypeStrategyFactory.getStrategy(transactionType);
 
@@ -69,7 +70,8 @@ public class TransactionsServiceImpl implements TransactionsService {
     return accounts;
   }
 
-  private void validateAccountCategoryAndPaymentMode(String appUserId, List<Long> accounts, Long categoryId, Long paymentModeId) {
+  private void validateAccountCategoryAndPaymentMode(String appUserId, List<Long> accounts, Long categoryId,
+      Long paymentModeId) {
     final var accountExists = accountService.existsByUserAndAccount(appUserId, accounts);
 
     if (!accountExists) {
@@ -96,10 +98,13 @@ public class TransactionsServiceImpl implements TransactionsService {
   }
 
   @Override
-  public TransactionDto updateTransaction(String appUserId, TransactionRequestDto requestBody) throws InsufficientAccountBalanceException {
+  public TransactionDto updateTransaction(String appUserId, TransactionRequestDto requestBody)
+      throws InsufficientAccountBalanceException {
     getAndValidateAccounts(requestBody, appUserId);
 
-    final var transactionType = TransactionType.valueOf(requestBody.type()) == TransactionType.TRANSFER? TransactionType.TRANSFER: TransactionType.INCOME;
+    final var transactionType = TransactionType.valueOf(requestBody.type()) == TransactionType.TRANSFER
+        ? TransactionType.TRANSFER
+        : TransactionType.INCOME;
 
     final var strategy = txnTypeStrategyFactory.getStrategy(transactionType);
 
@@ -113,7 +118,7 @@ public class TransactionsServiceImpl implements TransactionsService {
 
   @Override
   public List<TransactionDto> getRecentTransactions(String userId) {
-    var transactions =  transactionRepo.findAllByAppUserRecent(userId, PageRequest.ofSize(5));
+    var transactions = transactionRepo.findAllByAppUserRecent(userId, PageRequest.ofSize(5));
 
     return transactionMapper.transactionDtosToTransactionDtos(transactions);
   }

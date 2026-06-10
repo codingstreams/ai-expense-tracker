@@ -14,7 +14,7 @@ public class AiConfig {
   ChatClient chatClient(ChatClient.Builder chatClientBuilder) {
     return chatClientBuilder.defaultOptions(
         ChatOptions.builder()
-            .model("gemma3:1b")
+            .model("qwen2.5-coder:3b")
             .temperature(0.2)
             .build())
         .build();
