@@ -1,6 +1,5 @@
 package com.example.et_core.controller;
 
-import com.example.et_core.service.notification.NotificationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,12 +12,12 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 @RequestMapping("/api/notifications")
 @RequiredArgsConstructor
 public class NotificationController {
-  private final NotificationService notificationService;
+  // private final NotificationService notificationService;
 
-  @GetMapping("/status/{jobId}")
-  public ResponseEntity<SseEmitter> connect(@PathVariable String jobId){
-    final var emitter = notificationService.get(jobId);
+  // @GetMapping("/status/{jobId}")
+  // public ResponseEntity<SseEmitter> connect(@PathVariable String jobId){
+  // final var emitter = notificationService.get(jobId);
 
-    return ResponseEntity.ok(emitter);
-  }
+  // return ResponseEntity.ok(emitter);
+  // }
 }

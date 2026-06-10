@@ -1,11 +1,9 @@
 package com.example.et_core.event;
 
-import com.example.et_core.dto.JobStatusDto;
 import com.example.et_core.mapper.TransactionMapper;
 import com.example.et_core.service.ai.AiParseResult;
 import com.example.et_core.service.ai.parsetask.AiParseTaskService;
 import com.example.et_core.service.category.CategoryService;
-import com.example.et_core.service.notification.NotificationService;
 import com.example.et_core.service.transaction.TransactionsService;
 import com.example.et_core.service.userconfig.UserConfigService;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +17,6 @@ import tools.jackson.databind.ObjectMapper;
 @RequiredArgsConstructor
 @Slf4j
 public class EventHandler {
-  private final NotificationService notificationService;
   private final TransactionsService transactionsService;
   private final UserConfigService userConfigService;
   private final AiParseTaskService aiParseTaskService;
@@ -51,8 +48,6 @@ public class EventHandler {
 
       if (aiParseResult.errorMessage() != null && !aiParseResult.errorMessage().isEmpty()) {
         log.warn("AI parsing returned error: {}. Aborting transaction save.", aiParseResult.errorMessage());
-        notificationService.send(JobStatusDto.of(jobId, "FAILED"));
-        notificationService.closeConnection(jobId);
         return;
       }
 
@@ -70,15 +65,10 @@ public class EventHandler {
       log.info("Transaction saved successfully for Job ID: {}", event.jobId());
 
       // Notify client AFTER successful save to prevent false-positive "Success"
-      notificationService.send(JobStatusDto.of(jobId,
-          event.task().getStatus().name()));
-      notificationService.closeConnection(jobId);
 
     } catch (Exception e) {
       log.error("Failed to save transaction for completed AI parsing task. Job ID: {}", event.jobId(), e);
       try {
-        notificationService.send(JobStatusDto.of(jobId, "FAILED"));
-        notificationService.closeConnection(jobId);
       } catch (Exception notifyEx) {
         log.error("Failed to send FAILED notification status to client for Job ID: {}", event.jobId(), notifyEx);
       }
@@ -88,6 +78,5 @@ public class EventHandler {
   @EventListener(AiParsingTaskCreated.class)
   public void openConnection(AiParsingTaskCreated event) {
     log.info("Ai parsing task created. Opening connection...");
-    notificationService.openConnection(event.jobId().toString());
   }
 }
