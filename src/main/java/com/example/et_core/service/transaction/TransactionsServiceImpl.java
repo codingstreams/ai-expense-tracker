@@ -95,7 +95,7 @@ public class TransactionsServiceImpl implements TransactionsService {
 
   @Override
   public List<TransactionDto> getAllTransactions(String appUserId) {
-    final var transactions = transactionRepo.findAllByAppUser(appUserId);
+    final var transactions = transactionRepo.findAllByAppUserId(appUserId);
     return transactionMapper.transactionDtosToTransactionDtos(transactions);
   }
 
@@ -120,7 +120,7 @@ public class TransactionsServiceImpl implements TransactionsService {
 
   @Override
   public List<TransactionDto> getRecentTransactions(String userId) {
-    var transactions = transactionRepo.findAllByAppUserRecent(userId, PageRequest.ofSize(5));
+    var transactions = transactionRepo.findAllByAppUserIdOrderByTransactionDateDesc(userId, PageRequest.ofSize(5));
 
     return transactionMapper.transactionDtosToTransactionDtos(transactions);
   }

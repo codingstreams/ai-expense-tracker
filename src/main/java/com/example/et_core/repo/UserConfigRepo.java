@@ -8,8 +8,5 @@ import org.springframework.data.repository.CrudRepository;
 import java.util.Optional;
 
 public interface UserConfigRepo extends CrudRepository<UserConfig, Long> {
-    @Query("SELECT c " +
-        "FROM UserConfig c " +
-        "WHERE c.appUser.id = :appUserId")
     Optional<UserConfig> findByAppUserId(String appUserId);
 }

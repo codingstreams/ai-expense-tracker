@@ -9,10 +9,9 @@ import java.util.Optional;
 
 public interface UserCategoryRepo extends JpaRepository<UserCategory, Long> {
 
-    @Query("SELECT COUNT(*) > 0 " +
+    @Query("SELECT COUNT(c) > 0 " +
             "FROM UserCategory c " +
-            "JOIN c.appUser u " +
-            "WHERE u.id = :appUserId " +
+            "WHERE c.appUser.id = :appUserId " +
             "AND c.id = :categoryId")
     boolean existsByAppUserIdAndCategoryId(String appUserId, Long categoryId);
 

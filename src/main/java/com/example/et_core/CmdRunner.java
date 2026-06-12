@@ -8,9 +8,11 @@ import com.example.et_core.repo.BankRepo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 @Component
+@Order(2)
 @RequiredArgsConstructor
 @Slf4j
 public class CmdRunner implements CommandLineRunner {

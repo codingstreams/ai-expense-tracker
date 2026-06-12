@@ -74,7 +74,7 @@ class TransactionRepositoryTest {
         Pageable pageable = PageRequest.of(0, 10);
 
         // Act
-        List<Transaction> results = transactionRepo.findAllByAppUserRecent(userId, pageable);
+        List<Transaction> results = transactionRepo.findAllByAppUserIdOrderByTransactionDateDesc(userId, pageable);
 
         // Assert
         assertThat(results).hasSize(3);
@@ -87,7 +87,7 @@ class TransactionRepositoryTest {
 
     @Test
     void shouldReturnEmptyListWhenUserHasNoTransactions() {
-        List<Transaction> results = transactionRepo.findAllByAppUserRecent("non-existent", PageRequest.of(0, 10));
+        List<Transaction> results = transactionRepo.findAllByAppUserIdOrderByTransactionDateDesc("non-existent", PageRequest.of(0, 10));
         assertThat(results).isEmpty();
     }
 

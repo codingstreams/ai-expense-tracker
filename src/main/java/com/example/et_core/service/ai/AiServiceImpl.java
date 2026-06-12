@@ -13,6 +13,8 @@ import com.example.et_core.model.SystemCategory;
 import com.example.et_core.model.Status;
 import com.example.et_core.service.ai.parsetask.AiParseTaskService;
 import com.example.et_core.service.category.CategoryService;
+
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
@@ -24,6 +26,7 @@ import tools.jackson.databind.ObjectMapper;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
@@ -116,6 +119,7 @@ public class AiServiceImpl implements AiService {
   }
 
   @Override
+  @Transactional
   public AiTaskDto save(String appUserId, AiInputDto requestBody) {
 
     final var aiParsingTask = AiParsingTask.builder()
@@ -126,7 +130,14 @@ public class AiServiceImpl implements AiService {
 
     final var saved = aiParseTaskService.save(aiParsingTask);
 
-    eventPublisher.publishEvent(new AiParsingTaskCreated(aiParsingTask.getId()));
+    CompletableFuture.runAsync(() -> {
+      try {
+        Thread.sleep(1000);
+      } catch (InterruptedException e) {
+        Thread.currentThread().interrupt();
+      }
+      eventPublisher.publishEvent(new AiParsingTaskCreated(aiParsingTask.getId()));
+    });
 
     return aiParseTaskMapper.toDto(saved, "Ai Task Saved!");
   }

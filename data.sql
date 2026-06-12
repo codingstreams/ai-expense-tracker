@@ -29,7 +29,7 @@ END;
  ('IndusInd Bank'),
  ('Kotak Mahindra Bank');
 
- INSERT INTO category (name) VALUES
+ INSERT INTO system_category (name) VALUES
  ('Groceries'),
  ('Dining Out'),
  ('Rent/EMI'),

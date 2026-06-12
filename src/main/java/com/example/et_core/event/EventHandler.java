@@ -7,8 +7,6 @@ import com.example.et_core.service.category.CategoryService;
 import com.example.et_core.service.transaction.TransactionsService;
 import com.example.et_core.service.userconfig.UserConfigService;
 
-import jakarta.transaction.Transactional;
-
 import com.example.et_core.security.TenantContext;
 import com.example.et_core.service.notifications.NotificationService;
 import com.example.et_core.service.notifications.NotificationService.NotificationEvent;
@@ -104,6 +102,8 @@ public class EventHandler {
       } finally {
         TenantContext.clear();
       }
+
+      log.info("Completed processing Ai Parsing Job ID: {}", jobId);
     }, taskExecutor);
   }
 }

@@ -25,7 +25,6 @@ public class AiController {
   public ResponseEntity<AiTaskDto> parseRawText(@RequestBody AiInputDto requestBody,
       @AuthenticationPrincipal String userId) {
     final var response = aiService.save(userId, requestBody);
-
     return ResponseEntity.ok(response);
   }
 

@@ -16,10 +16,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 public interface TransactionRepo extends CrudRepository<Transaction, Long> {
-  @Query("SELECT t " +
-      "FROM Transaction t " +
-      "WHERE t.appUser.id = :appUserId")
-  List<Transaction> findAllByAppUser(String appUserId);
+  List<Transaction> findAllByAppUserId(String appUserId);
 
   @Modifying
   @Transactional
@@ -29,16 +26,12 @@ public interface TransactionRepo extends CrudRepository<Transaction, Long> {
       "AND t.id = :transactionId")
   void deleteByIdAndAppUserId(Long transactionId, String appUserId);
 
-  @Query("SELECT t FROM Transaction t WHERE t.transferId = :transferId AND t.appUser.id = :appUserId")
   List<Transaction> findAllByTransferIdAndAppUserId(String transferId, String appUserId);
 
   // ALTER TABLE your_table
   // ALTER COLUMN your_column_name TYPE DATE
   // USING TO_DATE(your_column_name, 'YYYY-MM-DD');
-  @Query("SELECT t FROM Transaction t " +
-      "WHERE t.appUser.id = :appUserId " +
-      "ORDER BY t.transactionDate DESC")
-  List<Transaction> findAllByAppUserRecent(String appUserId, Pageable pageable);
+  List<Transaction> findAllByAppUserIdOrderByTransactionDateDesc(String appUserId, Pageable pageable);
 
   @Query("SELECT t.transactionDate as transactionDate, " +
          "SUM(CASE WHEN t.type = com.example.et_core.model.TransactionType.INCOME THEN t.amount ELSE 0.0 END) as income, " +

@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+import org.springframework.context.SmartLifecycle;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
@@ -12,17 +13,51 @@ import lombok.extern.slf4j.Slf4j;
 
 @Service
 @Slf4j
-public class SseNotificationService implements NotificationService {
+public class SseNotificationService implements NotificationService, SmartLifecycle {
   private final ConcurrentMap<String, SseEmitter> emitters = new ConcurrentHashMap<>();
+  private volatile boolean running = false;
+
+  @Override
+  public void start() {
+    log.info("Starting SseNotificationService...");
+    this.running = true;
+  }
+
+  @Override
+  public void stop() {
+    log.info("Stopping SseNotificationService, closing all active SSE emitters...");
+    shutdown();
+    this.running = false;
+  }
+
+  @Override
+  public boolean isRunning() {
+    return this.running;
+  }
+
+  @Override
+  public int getPhase() {
+    // Return Integer.MAX_VALUE so this bean is stopped before WebServerGracefulShutdownLifecycle
+    return Integer.MAX_VALUE;
+  }
 
   @PreDestroy
   public void shutdown() {
+    if (emitters.isEmpty()) {
+      return;
+    }
     log.info("Shutting down SseNotificationService, closing all active SSE emitters...");
     emitters.forEach((key, emitter) -> {
       try {
         emitter.complete();
+      } catch (IllegalStateException e) {
+        if (e.getMessage() != null && e.getMessage().contains("recycled")) {
+          log.debug("Emitter already recycled during shutdown: {}", key);
+        } else {
+          log.warn("Failed to complete emitter for session due to invalid state: {}", key, e);
+        }
       } catch (Exception e) {
-        log.warn("Failed to complete emitter for session {}", key, e);
+        log.warn("Failed to complete emitter for session: {}", key, e);
       }
     });
     emitters.clear();
@@ -33,6 +68,10 @@ public class SseNotificationService implements NotificationService {
 
   @Override
   public SseEmitter openConnection(String userId, String sessionId) {
+    if (!running) {
+      log.warn("Attempt to open connection when service is not running (shutting down): {}", userId);
+      throw new IllegalStateException("Service is shutting down");
+    }
     SseEmitter emitter = new SseEmitter(TIMEOUT);
     emitters.put(userId + ":" + sessionId, emitter);
 
