@@ -16,8 +16,12 @@ import com.example.et_core.service.transaction.strategy.OperationType;
 import com.example.et_core.service.transaction.strategy.TxnTypeStrategyFactory;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import com.example.et_core.specification.TransactionSpecification;
+import java.time.LocalDate;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -94,9 +98,24 @@ public class TransactionsServiceImpl implements TransactionsService {
   }
 
   @Override
-  public List<TransactionDto> getAllTransactions(String appUserId) {
-    final var transactions = transactionRepo.findAllByAppUserId(appUserId);
-    return transactionMapper.transactionDtosToTransactionDtos(transactions);
+  public Page<TransactionDto> getAllTransactions(
+      String appUserId,
+      LocalDate startDate,
+      LocalDate endDate,
+      Double minAmount,
+      Double maxAmount,
+      List<TransactionType> types,
+      List<Long> categoryIds,
+      List<Long> accountIds,
+      List<Long> paymentModeIds,
+      String search,
+      Pageable pageable
+  ) {
+    final var spec = TransactionSpecification.filterTransactions(
+        appUserId, startDate, endDate, minAmount, maxAmount, types, categoryIds, accountIds, paymentModeIds, search
+    );
+    final var transactionPage = transactionRepo.findAll(spec, pageable);
+    return transactionPage.map(transactionMapper::transactionDtoToTransactionDto);
   }
 
   @Override

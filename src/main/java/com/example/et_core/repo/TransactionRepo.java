@@ -10,12 +10,13 @@ import org.springframework.data.repository.CrudRepository;
 import com.example.et_core.dto.DailyCashFlowProjection;
 import com.example.et_core.dto.MonthlyCashFlowProjection;
 
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDate;
 import java.util.List;
 
-public interface TransactionRepo extends CrudRepository<Transaction, Long> {
+public interface TransactionRepo extends CrudRepository<Transaction, Long>, JpaSpecificationExecutor<Transaction> {
   List<Transaction> findAllByAppUserId(String appUserId);
 
   @Modifying

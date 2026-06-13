@@ -10,6 +10,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.format.annotation.DateTimeFormat;
+import com.example.et_core.model.TransactionType;
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -28,8 +33,22 @@ public class TransactionsController {
     }
 
     @GetMapping
-    public ResponseEntity<List<TransactionDto>> getAllTransactions(@AuthenticationPrincipal String userId) {
-        final var responseBody = transactionsService.getAllTransactions(userId);
+    public ResponseEntity<Page<TransactionDto>> getAllTransactions(
+            @AuthenticationPrincipal String userId,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
+            @RequestParam(required = false) Double minAmount,
+            @RequestParam(required = false) Double maxAmount,
+            @RequestParam(required = false) List<TransactionType> types,
+            @RequestParam(required = false) List<Long> categoryIds,
+            @RequestParam(required = false) List<Long> accountIds,
+            @RequestParam(required = false) List<Long> paymentModeIds,
+            @RequestParam(required = false) String search,
+            Pageable pageable
+    ) {
+        final var responseBody = transactionsService.getAllTransactions(
+            userId, startDate, endDate, minAmount, maxAmount, types, categoryIds, accountIds, paymentModeIds, search, pageable
+        );
 
         return ResponseEntity
             .status(HttpStatus.OK)
