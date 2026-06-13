@@ -1,8 +1,6 @@
 package com.example.et_core.repo;
 
-
 import com.example.et_core.model.UserConfig;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 
 import java.util.Optional;

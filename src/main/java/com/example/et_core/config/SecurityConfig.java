@@ -3,6 +3,8 @@ package com.example.et_core.config;
 import com.example.et_core.security.BearerAuthProvider;
 import com.example.et_core.security.JwtAuthFilter;
 import io.jsonwebtoken.security.Keys;
+import jakarta.servlet.DispatcherType;
+
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -30,15 +32,16 @@ public class SecurityConfig {
 
   @Bean
   SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity,
-                                          JwtAuthFilter jwtAuthFilter,
-                                          AuthenticationEntryPoint authenticationEntryPoint,
-                                          UrlBasedCorsConfigurationSource corsConfig) {
+      JwtAuthFilter jwtAuthFilter,
+      AuthenticationEntryPoint authenticationEntryPoint,
+      UrlBasedCorsConfigurationSource corsConfig) {
 
     httpSecurity
         .cors(cors -> cors.configurationSource(corsConfig))
         .csrf(CsrfConfigurer::disable)
         .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .authorizeHttpRequests(http -> http
+            .dispatcherTypeMatchers(DispatcherType.ASYNC).permitAll()
             .requestMatchers("/api/auth/**", "/error")
             .permitAll()
             .anyRequest()
@@ -55,8 +58,9 @@ public class SecurityConfig {
   }
 
   @Bean
-  AuthenticationManager authenticationManager(@Qualifier("daoAuthenticationProvider") AuthenticationProvider daoAuthenticationProvider,
-                                              @Qualifier("bearerAuthProvider") BearerAuthProvider bearerAuthProvider) {
+  AuthenticationManager authenticationManager(
+      @Qualifier("daoAuthenticationProvider") AuthenticationProvider daoAuthenticationProvider,
+      @Qualifier("bearerAuthProvider") BearerAuthProvider bearerAuthProvider) {
     final List<AuthenticationProvider> authenticationProvider = List.of(daoAuthenticationProvider, bearerAuthProvider);
     final var providerManager = new ProviderManager(authenticationProvider);
     return providerManager;
